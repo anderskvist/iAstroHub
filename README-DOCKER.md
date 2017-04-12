@@ -17,6 +17,10 @@ Remaining work to be done towards this ends is:
 
 * From the iAstroHub root directory, run `./build`
 
+## Running the container
+
+* For full functionality, you must run the container with the `--cap-add SYS_RAWIO` option, or alternatively, with the --privileged flag. You can test the SYS_RAWIO capability by running `/usr/local/bin/pktriggercord-cli -v`.
+
 ### Manual Steps
 
 The following steps are not yet automatable, and currentlymust be run by hand on the final image.
@@ -404,19 +408,6 @@ cd /home/pi/
 wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh
 chmod 777 gphoto2-updater.sh
 ./gphoto2-updater.sh -s
-
-
-
-16. Pentax
-
-apt-get install ufraw ufraw-batch libgtk2.0-dev
-
-wget https://github.com/asalamon74/pktriggercord/releases/download/v0.84.00/pkTriggerCord-0.84.00.src.tar.gz
-tar xvf pkTriggerCord-0.84.00.src.tar.gz
-cd pktriggercord-0.84.00/
-sudo make
-sudo make install
-pktriggercord-cli -v
 
 
 

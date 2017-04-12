@@ -51,3 +51,12 @@ RUN apt-get -fy install
 RUN wget http://sourceforge.net/projects/skychart/files/2-catalogs/Nebulea/skychart-data-pictures_4.0-3421_all.deb
 RUN dpkg -i skychart-data-pictures_4.0-3421_all.deb
 WORKDIR /
+
+# 16. Pentax
+RUN apt-get -y install ufraw ufraw-batch libgtk2.0-dev
+RUN wget https://github.com/asalamon74/pktriggercord/releases/download/v0.84.00/pkTriggerCord-0.84.00.src.tar.gz
+RUN tar xvf pkTriggerCord-0.84.00.src.tar.gz
+WORKDIR pktriggercord-0.84.00/
+RUN make
+RUN make install
+WORKDIR /
