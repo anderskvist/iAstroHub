@@ -25,3 +25,29 @@ RUN apt-get -y install \
 RUN echo "iAstroHub" > /etc/hostname
 # 127.0.1.1 was used in the initial README; I believe it should be 127.0.0.1.
 RUN echo "127.0.0.1 iAstroHub" >> /etc/hosts
+
+# 12. Skychart
+RUN apt-get -y install \
+  espeak \
+  libglu1-mesa \
+  libgtk2.0-0 \
+  libpango1.0-0 \
+  xplanet
+RUN mkdir /skychart
+WORKDIR /skychart
+# Install on Raspbian/arm
+RUN uname -a | grep arm && wget http://sourceforge.net/projects/libpasastro/files/version%201.1/libpasastro_1.1-15_armhf.deb || true
+RUN uname -a | grep arm && dpkg -i libpasastro_1.1-15_armhf.deb || true
+RUN uname -a | grep arm && wget http://sourceforge.net/projects/skychart/files/1-software/version_4.0/skychart_4.0-3575b_armhf.deb || true
+RUN uname -a | grep arm && dpkg -i skychart_4.0-3575b_armhf.deb || true
+# Install on Debian/x64
+RUN uname -a | grep x86_64 && wget http://sourceforge.net/projects/libpasastro/files/version%201.1/libpasastro_1.1-14_amd64.deb || true
+RUN uname -a | grep x86_64 && dpkg -i libpasastro_1.1-14_amd64.deb || true
+RUN uname -a | grep x86_64 && wget http://sourceforge.net/projects/skychart/files/1-software/version_4.0/skychart_4.0-3575b_amd64.deb || true
+RUN uname -a | grep x86_64 && dpkg -i skychart_4.0-3575b_amd64.deb || true
+# Correct dependencies after manual package installation.
+RUN apt-get -fy install
+# Install data set
+RUN wget http://sourceforge.net/projects/skychart/files/2-catalogs/Nebulea/skychart-data-pictures_4.0-3421_all.deb
+RUN dpkg -i skychart-data-pictures_4.0-3421_all.deb
+WORKDIR /

@@ -17,6 +17,29 @@ Remaining work to be done towards this ends is:
 
 * From the iAstroHub root directory, run `./build`
 
+### Manual Steps
+
+The following steps are not yet automatable, and currentlymust be run by hand on the final image.
+
+#### Skychart
+
+12.4 Setup
+
+* Launch `skychart`
+* Setup > Observatory
+* Setup > Chart, coordinate > check Equatorial, Apparent
+* Setup > Catalog > Check XHIP
+* Setup > Display > uncheck finders, show labels, show mark index
+* Click "show pictures" icon to disable
+* Exit and save setting
+
+## Dockerization Notes and Changes
+
+The following changes have been made while Dockerizing iAstroHub:
+
+* /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
+* Skychart upgraded to version 4.
+
 ## Status
 
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
@@ -294,151 +317,6 @@ sudo nano /etc/ser2net.conf
 3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS
 
 sudo /etc/init.d/ser2net restart
-
-
-
-12. Skychart
-
-sudo apt-get install libgtk2.0-0 libpango1.0-0 xplanet
-
-
-12.1 Build from source codes
-
-sudo apt-get install fpc
-
-wget https://sourceforge.net/projects/lazarus/files/Lazarus%20Zip%20_%20GZip/Lazarus%201.6/lazarus-1.6.0-0.tar.gz
-sudo tar -zxvf lazarus-1.6.0-0.tar.gz
-cd lazarus
-sudo make
-
-sudo ./lazarus
-Click...Start IDE,  Ignore
-Menu>Package>Install/Uninstall Packages
-Install the components Printer4Lazarus and TurboPowerIPro
-Click...save and rebuild IDE 
-Click...Continue
-wait until the program is restarted. Then quit.
-
-wget https://sourceforge.net/projects/skychart/files/1-software/version_3.10/skychart-3.10-2854-src.tar.xz
-sudo tar -xvf skychart-3.10-2854-src.tar.xz
-
-cd /home/pi/skychart-3.10-2854-src/
-
-sudo mkdir /home/pi/skychart-3.10-2854-src/skychart/component/lib/arm-linux-gtk2
-sudo mkdir /home/pi/skychart-3.10-2854-src/skychart/units/arm-linux-gtk2
-sudo mkdir /home/pi/skychart-3.10-2854-src/varobs/units/arm-linux-gtk2
-
-nano skychart/component/jdcalendar/jdcalendar.pas
-****************LINE 148*******************************
-  procedure DoButtonClick(Sender: TObject);
-****************LINE 827********************************
-  inherited ButtonClick;
-********************************************************
-
-sudo ./configure fpc=/usr/lib/fpc/2.6.4 lazarus=/home/pi/lazarus prefix=/usr/local
-sudo make
-sudo make install
-
-sudo make install_data
-
-nano install_pict.sh
-************************************************************
-#!/bin/bash
-
-# install nebulae catalog data
-
-function InstPict {
-  pkg=pictures_sac_3.2.tar.xz
-  ddir=$2
-  pkgz=BaseData/pictures_sac_3.2.tar.xz
-  if [ ! -e $pkgz ]; then
-     wget https://sourceforge.net/projects/skychart/files/4-source_data/pictures_sac_3.2.tar.xz -O $pkgz
-  fi
-  tar -xJf $pkgz -C $ddir
-}
-
-destdir=$1
-
-if [ -z "$destdir" ]; then
-   export destdir=/tmp/skychart
-fi
-
-echo Install DSO pictures to $destdir
-
-install -m 755 -d $destdir
-install -m 755 -d $destdir/share
-install -m 755 -d $destdir/share/skychart
-
-InstPict pictures_sac $destdir/share/skychart
-************************************************************
-
-sudo make install_pict
-
-
-12.2 Install from binary (RECOMMENDED)
-
-chmod 777 /home/pi/skychart-3.10-2854-src -R
-cd /home/pi/skychart-3.10-2854-src
-sudo make install
-sudo ldconfig
-
-sudo make install_data
-
-nano install_pict.sh
-************************************************************
-#!/bin/bash
-
-# install nebulae catalog data
-
-function InstPict {
-  pkg=pictures_sac_3.2.tar.xz
-  ddir=$2
-  pkgz=BaseData/pictures_sac_3.2.tar.xz
-  if [ ! -e $pkgz ]; then
-     wget https://sourceforge.net/projects/skychart/files/4-source_data/pictures_sac_3.2.tar.xz -O $pkgz
-  fi
-  tar -xJf $pkgz -C $ddir
-}
-
-destdir=$1
-
-if [ -z "$destdir" ]; then
-   export destdir=/tmp/skychart
-fi
-
-echo Install DSO pictures to $destdir
-
-install -m 755 -d $destdir
-install -m 755 -d $destdir/share
-install -m 755 -d $destdir/share/skychart
-
-InstPict pictures_sac $destdir/share/skychart
-************************************************************
-
-sudo make install_pict
-
-
-12.3 Install from armhf binary on the website (TOO SLOW)
-
-mkdir skychart
-cd skychart
-
-wget http://sourceforge.net/projects/skychart/files/1-software/version_3.10/skychart_3.10-2854_armhf.deb
-dpkg -i skychart_3.10-2854_armhf.deb
-
-wget http://sourceforge.net/projects/skychart/files/2-catalogs/Nebulea/skychart-data-pictures_3.2_all.deb
-dpkg -i skychart-data-pictures_3.2_all.deb
-
-
-12.4 Setup
-
-skychart
-Setup > Observatory
-Setup > Chart, coordinate > check Equatorial, Apparent
-Setup > Catalog > Check XHIP
-Setup > Display > uncheck finders, show labels, show mark index
-Click "show pictures" icon to disable
-Exit and save setting
 
 
 
