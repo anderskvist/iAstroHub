@@ -20,3 +20,8 @@ RUN apt-get -y install \
 RUN apt-get -y install \
   curl \
   libwww-perl
+
+# 11. Hostname
+RUN echo "iAstroHub" > /etc/hostname
+# 127.0.1.1 was used in the initial README; I believe it should be 127.0.0.1.
+RUN echo "127.0.0.1 iAstroHub" >> /etc/hosts

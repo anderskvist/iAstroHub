@@ -297,24 +297,6 @@ sudo /etc/init.d/ser2net restart
 
 
 
-11. Hostname
-
-sudo nano /etc/hostname
-*********************************
-iAstroHub
-
-
-sudo nano /etc/hosts
-*****************************************************************
-127.0.0.1       localhost
-::1             localhost ip6-localhost ip6-loopback
-ff02::1         ip6-allnodes
-ff02::2         ip6-allrouters
-
-127.0.1.1       iAstroHub
-
-
-
 12. Skychart
 
 sudo apt-get install libgtk2.0-0 libpango1.0-0 xplanet
