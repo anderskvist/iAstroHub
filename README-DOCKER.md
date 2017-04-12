@@ -297,12 +297,6 @@ sudo /etc/init.d/ser2net restart
 
 
 
-10. Pushover Notification
-
-apt-get install curl libwww-perl
-
-
-
 11. Hostname
 
 sudo nano /etc/hostname
