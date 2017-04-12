@@ -63,13 +63,6 @@ ALL ALL=(ALL) NOPASSWD: ALL
 
 
 
-3. Update
-
-sudo apt-get update
-sudo apt-get upgrade
-
-
-
 4. Wifi AP mode
 
 sudo apt-get install dnsmasq hostapd
