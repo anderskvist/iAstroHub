@@ -12,3 +12,7 @@ Remaining work to be done towards this ends is:
 
 * MacOS or Linux development environment
 * Docker installed and running
+
+## Building
+
+* From the iAstroHub root directory, run `./build`
