@@ -97,12 +97,6 @@ sudo hostapd -B /etc/hostapd/ap.conf & > /dev/null 2>&1
 
 
 
-5. Install tools
-
-sudo apt-get install nano aptitude gcc g++ make usbutils bc wget build-essential bc
-
-
-
 6. CPU and Temp
 
 time echo "scale=2000; a(1)*4" | bc -l

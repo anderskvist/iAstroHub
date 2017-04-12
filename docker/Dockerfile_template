@@ -3,3 +3,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 3. System Update
 RUN apt-get -y update
 RUN apt-get -y upgrade
+
+# 5. Install tools
+RUN apt-get -y install \
+  aptitude \
+  bc \
+  build-essential \
+  g++ \
+  gcc \
+  make \
+  nano \
+  usbutils \
+  wget
