@@ -8,3 +8,7 @@ Remaining work to be done towards this ends is:
 * Validate Dockerized hardware control works on Raspbian
 * Enable full iAstroHub deployment via AstroSwarm
 
+## Prerequisites
+
+* MacOS or Linux development environment
+* Docker installed and running
