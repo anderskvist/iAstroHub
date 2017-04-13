@@ -1,0 +1,11 @@
+--- php.ini	2017-02-08 09:07:11.000000000 +0000
++++ php.ini.new	2017-04-13 03:17:51.283202179 +0000
+@@ -199,7 +199,7 @@
+ ; Development Value: Off
+ ; Production Value: Off
+ ; http://php.net/short-open-tag
+-short_open_tag = Off
++short_open_tag = On
+ 
+ ; Allow ASP-style <% %> tags.
+ ; http://php.net/asp-tags
