@@ -60,3 +60,9 @@ WORKDIR pktriggercord-0.84.00/
 RUN make
 RUN make install
 WORKDIR /
+
+# 2. Login as root
+RUN apt-get -y install sudo
+RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+
+

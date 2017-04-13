@@ -79,17 +79,6 @@ Expand filesystem and disable serial in advanced options, exit and reboot.
 
 
 
-2. Login as root
-
-sudo visudo
-
-*** add this in the bottom line ****
-ALL ALL=(ALL) NOPASSWD: ALL
-
-"Ctrl-x" to save and exit
-
-
-
 4. Wifi AP mode
 
 sudo apt-get install dnsmasq hostapd
