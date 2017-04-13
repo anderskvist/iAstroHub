@@ -1,10 +1,6 @@
 #!/bin/sh
 
-cd ./docker
-
 ./clean
 ./configure
 docker build -t iastrohub ./
 rm Dockerfile
-
-cd ../
