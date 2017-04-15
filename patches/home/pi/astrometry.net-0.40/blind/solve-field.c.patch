@@ -1,0 +1,78 @@
+--- solve-field.c	2012-03-26 17:23:30.000000000 +0000
++++ solve-field.c.new	2017-04-10 01:03:38.000000000 +0000
+@@ -35,6 +35,7 @@
+ #include <errors.h>
+ #include <getopt.h>
+ #include <assert.h>
++#include <time.h>
+ 
+ #include "boilerplate.h"
+ #include "an-bool.h"
+@@ -554,10 +555,13 @@
+ 	double ra, dec, fieldw, fieldh;
+ 	char rastr[32], decstr[32];
+ 	char* fieldunits;
++	
++	FILE *pt;	
+ 
+ 	// print info about the field.
+ 	logmsg("Field: %s\n", axy->imagefn ? axy->imagefn : axy->xylsfn);
+ 	if (file_exists(axy->wcsfn)) {
++		double orient;
+ 		if (axy->wcs_last_mod) {
+ 			time_t t = file_get_last_modified_time(axy->wcsfn);
+ 			if (t == axy->wcs_last_mod) {
+@@ -571,9 +575,22 @@
+ 		sip_get_radec_center(&wcs, &ra, &dec);
+ 		sip_get_radec_center_hms_string(&wcs, rastr, decstr);
+ 		sip_get_field_size(&wcs, &fieldw, &fieldh, &fieldunits);
++		orient = sip_get_orientation(&wcs);
+ 		logmsg("Field center: (RA,Dec) = (%.4g, %.4g) deg.\n", ra, dec);
+ 		logmsg("Field center: (RA H:M:S, Dec D:M:S) = (%s, %s).\n", rastr, decstr);
+ 		logmsg("Field size: %g x %g %s\n", fieldw, fieldh, fieldunits);
++		logmsg("Field rotation angle: up is %g degrees E of N\n", orient);
++		
++		pt=fopen("/home/pi/www/AM_frame.txt","w");
++		if ( fieldunits == "degrees") {
++			fieldw=fieldw*60;
++			fieldh=fieldh*60;
++		}
++		fprintf(pt,"%.2f\n",fieldw);
++		fprintf(pt,"%.2f\n",fieldh);
++		fprintf(pt,"%.2f\n",orient);
++		fclose(pt);
++		
+ 	} else {
+ 		logmsg("Did not solve (or no WCS file was written).\n");
+ 	}
+@@ -736,6 +753,10 @@
+ 	sl* tempfiles;
+ 	sl* tempdirs;
+ 	bool timestamp = FALSE;
++	
++	time_t start, stop;
++	int elapsed;
++	time(&start);
+ 
+     errors_print_on_exit(stderr);
+     fits_use_error_system();
+@@ -1327,6 +1348,19 @@
+ 	sl_free2(backendargs);
+     free(me);
+     augment_xylist_free_contents(allaxy);
++	
++	
++	time(&stop);
++	elapsed=(int)(stop-start);	
++	logmsg("Done in %d sec\n", elapsed);
++	
++	system("sudo python /home/pi/www/AM_convert.py &");
++	
++	logmsg("Mount can be aligned now.\n");
++	
++	logmsg("Result is ready for SkySafari.\n");
++	
++    logmsg("____________________________________________________");
+ 
+ 	return 0;
+ }

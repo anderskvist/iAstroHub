@@ -23,7 +23,7 @@ Remaining work to be done towards this ends is:
 
 ### Manual Steps
 
-The following steps are not yet automatable, and currentlymust be run by hand on the final image.
+The following steps are not yet automated, and so must be run by hand on the final image.
 
 #### Skychart
 
@@ -43,6 +43,19 @@ The following changes have been made while Dockerizing iAstroHub:
 
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
+* Astrometry compiled with updated gcc 4.9 suite rather than 4.4 suite.
+ 
+## Workflow Changes
+
+### Patches
+
+Files that previously lived in "modified_codes", as well as config file changes, are now persisted as patches. This way they remain compatible with other minor changes to the same set of files.
+
+The patch files live in a top level "patches" directory, whose structure mirrors the patch file locations in the container image.
+
+Patches are created via `diff -u <old file version> <new file version> > <original filename>.patch`. When patches are applied, the original file is renamed to <original filename>.orig so that it is available for post hoc inspection. If you need to make further changes to these files, make them in the container, and then recreate the patch by running `diff -u <filename> <filename.orig> > <filename>.patch`.
+
+You can then copy your latest patch into this git repository by running: `docker cp <container hash>:<filepath>.patch patches<filepath>.patch`.
 
 ## Status
 
@@ -207,72 +220,6 @@ sudo nano /etc/ser2net.conf
 3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS
 
 sudo /etc/init.d/ser2net restart
-
-
-
-13. Astrometry
-
-apt-get install gcc-4.4 g++-4.4
-rm /usr/bin/gcc
-rm /usr/bin/g++
-ln -s /usr/bin/gcc-4.4 /usr/bin/gcc
-ln -s /usr/bin/g++-4.4 /usr/bin/g++
-
-
-sudo apt-get install python-dev python-pip
-pip install pyephem
-
-sudo apt-get install python-pyfits
-python -c "import pyfits"
-
-sudo apt-get install libcairo2-dev libnetpbm10-dev netpbm libpng12-dev libjpeg-dev python-numpy zlib1g-dev
-
-cd /home/pi/
-sudo wget http://www.astrometry.net/downloads/astrometry.net-0.40.tar.bz2
-sudo tar xjf astrometry.net-0.40.tar.bz2
-
-**************** copy modified files
-solve-field.c to /home/pi/astrometry.net-0.40/blind/
-starutil.c to /home/pi/astrometry.net-0.40/util/
-****************
-
-cd /home/pi/astrometry.net-0.40
-
-sudo make
-sudo make install
-
-
-*********** install index files (4207 to 4210 for 0.5-2.0 deg FOV) to /usr/local/astrometry/data ********************
-
-cd /usr/local/astrometry/data/
-
-nano list.txt
--------------------------------
-http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
-http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
-http://broiler.astrometry.net/~dstn/4200/index-4208.fits
-http://broiler.astrometry.net/~dstn/4200/index-4209.fits
-http://broiler.astrometry.net/~dstn/4200/index-4210.fits
--------------------------------
-
-wget -i list.txt
-
-***********************************************************************************************
-
-rm /usr/bin/gcc
-rm /usr/bin/g++
-ln -s /usr/bin/gcc-4.9 /usr/bin/gcc
-ln -s /usr/bin/g++-4.9 /usr/bin/g++
 
 
 

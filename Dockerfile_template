@@ -75,10 +75,10 @@ RUN apt-get -y install \
   php5-common \
   php5-fpm
 COPY patches /patches
-RUN LOCATION=/etc/php5/cgi/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
-RUN LOCATION=/etc/php5/cli/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
-RUN LOCATION=/etc/php5/fpm/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
-RUN LOCATION=/etc/nginx/sites-available/default; patch -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/etc/php5/cgi/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/etc/php5/cli/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/etc/php5/fpm/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/etc/nginx/sites-available/default; patch -b -i /patches/$LOCATION.patch $LOCATION
 
 # 8. xvfb and vnc
 RUN apt-get -y install \
@@ -88,3 +88,42 @@ RUN apt-get -y install \
   xfonts-scalable \
   xvfb
 
+# 13. Astrometry
+RUN apt-get -y install \
+  libcairo2-dev \
+  libjpeg-dev \
+  libnetpbm10-dev \
+  libpng12-dev \
+  netpbm \
+  python-dev \
+  python-pip \
+  python-pyfits \
+  python-numpy \
+  zlib1g-dev
+RUN pip install pyephem
+WORKDIR /home/pi
+RUN wget http://www.astrometry.net/downloads/astrometry.net-0.40.tar.bz2
+RUN tar xjf astrometry.net-0.40.tar.bz2
+RUN rm astrometry.net-0.40.tar.bz2
+RUN LOCATION=/home/pi/astrometry.net-0.40/blind/solve-field.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/astrometry.net-0.40/util/starutil.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+WORKDIR /home/pi/astrometry.net-0.40
+RUN make
+RUN make install
+WORKDIR /usr/local/astrometry/data/
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
+WORKDIR /

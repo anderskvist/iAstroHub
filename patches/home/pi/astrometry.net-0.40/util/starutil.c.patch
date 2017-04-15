@@ -1,0 +1,76 @@
+--- starutil.c	2010-09-10 01:23:23.000000000 +0000
++++ starutil.c.new	2017-04-10 01:03:38.000000000 +0000
+@@ -290,41 +290,73 @@
+ // RA in degrees to H:M:S
+ inline void ra2hms(double ra, int* h, int* m, double* s) {
+     double rem;
++	int h_int, m_int, s_int;
++	FILE *pt;
++	
+     ra = fmod(ra, 360.0);
+     if (ra < 0.0)
+         ra += 360.0;
+     rem = ra / 15.0;
+     *h = floor(rem);
++	
++	h_int=(int)floor(rem);
++	
+     // remaining (fractional) hours
+     rem -= *h;
+     // -> minutes
+     rem *= 60.0;
+     *m = floor(rem);
++	
++	m_int=(int)floor(rem);
++	
+     // remaining (fractional) minutes
+     rem -= *m;
+     // -> seconds
+     rem *= 60.0;
+     *s = rem;
++	
++	s_int=(int)round(rem);
++	
++	pt=fopen("/home/pi/www/AM_RA.txt","w");
++	fprintf(pt,"%d\n%d\n%d\n",h_int,m_int,s_int);
++	fclose(pt);
++	
+ }
+ 
+ // Dec in degrees to D:M:S
+ void dec2dms(double dec, int* sign, int* d, int* m, double* s) {
+     double rem;
+     double flr;
++	int d_int, m_int, s_int;
++	FILE *pt;
++	
+     *sign = (dec >= 0.0) ? 1 : -1;
+     dec *= (*sign);
+     flr = floor(dec);
+     *d = flr;
++	
++	d_int=(int)floor(dec)*(*sign);
++	
+     // remaining degrees:
+     rem = dec - flr;
+     // -> minutes
+     rem *= 60.0;
+     *m = floor(rem);
++	
++	m_int=(int)floor(rem);
++	
+     // remaining (fractional) minutes
+     rem -= *m;
+     // -> seconds
+     rem *= 60.0;
+     *s = rem;
++	
++	s_int=(int)round(rem);
++	
++	pt=fopen("/home/pi/www/AM_DEC.txt","w");
++	fprintf(pt,"%d\n%d\n%d\n%d\n",(*sign),d_int*(*sign),m_int,s_int);
++	fclose(pt);
++	
+ }
+ 
+ void ra2hmsstring(double ra, char* str) {
