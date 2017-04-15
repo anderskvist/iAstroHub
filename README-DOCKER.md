@@ -27,8 +27,6 @@ The following steps are not yet automated, and so must be run by hand on the fin
 
 #### Skychart
 
-12.4 Setup
-
 * Launch `skychart`
 * Setup > Observatory
 * Setup > Chart, coordinate > check Equatorial, Apparent
@@ -36,6 +34,18 @@ The following steps are not yet automated, and so must be run by hand on the fin
 * Setup > Display > uncheck finders, show labels, show mark index
 * Click "show pictures" icon to disable
 * Exit and save setting
+
+#### Lin_guider
+
+cd /home/pi/lin_guider_pack/lin_guider/
+./lin_guider
+Setup > Video Settings > Device
+Setup > Video Settings > Expo
+Setup > Video Settings > Frame
+Setup > Pulse Device Settings > Device
+Setup > General Settings > Check "drift data"
+Setup > General Settings > Dithering timeout = 10 sec
+Processing > Calibration > Check "auto mode" and "two axis" (if guiding both axes)
 
 ## Dockerization Notes and Changes
 
@@ -228,69 +238,6 @@ sudo /etc/init.d/ser2net restart
 
 mv /lib/modules/4.4.13-v7+/kernel/drivers/usb/serial/ftdi_sio.ko /home/pi/.
 sudo depmod -a
-
-
-
-18. Lin_guider
-
-Copy the following files to /home/pi/
-REFERENCE: 
-https://sourceforge.net/projects/linguider/
-https://sourceforge.net/projects/cccd/
-https://sourceforge.net/projects/libnexstar/
-******************************************
-lin_guider-3.3.0.tar.bz2
-libnexstar-0.15.tar.gz
-firmware-ccd_1.3_all.deb
-libasicamera-0.3.0623-armhf.deb
-atikccdsdk-1.1-v7-armhf.deb
-******************************************
-
-sudo apt-get install libusb-1.0-0-dev libqt4-dev libftdi-dev fxload
-
-cd /home/pi/
-sudo tar -xvf libnexstar-0.15.tar.gz
-cd libnexstar-0.15/
-./configure
-sudo make
-sudo make install
-
-cd /home/pi/
-sudo tar -xvf lin_guider-3.3.0.tar.bz2
-
-**************** copy modified files ****************
-lin_guider.cpp            	to /home/pi/lin_guider_pack/lin_guider/src/
-rcalibration.cpp          	to /home/pi/lin_guider_pack/lin_guider/src/
-server.cpp                	to /home/pi/lin_guider_pack/lin_guider/src/
-video_asi.cpp			   	to /home/pi/lin_guider_pack/lin_guider/src/video_dev/	
-video_atik.cpp    			to /home/pi/lin_guider_pack/lin_guider/src/video_dev/
-video_qhy5ii.cpp        	to /home/pi/lin_guider_pack/lin_guider/src/video_dev/
-video_qhy6.cpp    			to /home/pi/lin_guider_pack/lin_guider/src/video_dev/
-video_sx.cpp    			to /home/pi/lin_guider_pack/lin_guider/src/video_dev/
-guider.h                  	to /home/pi/lin_guider_pack/lin_guider/include/
-rcalibration.h             	to /home/pi/lin_guider_pack/lin_guider/include/
-server.h            		to /home/pi/lin_guider_pack/lin_guider/include/
-*******************************************************
-
-cd /home/pi/lin_guider_pack/lin_guider/
-./configure
-sudo make
-
-cd /home/pi/
-dpkg -i firmware-ccd_1.3_all.deb
-dpkg -i libasicamera-0.3.0623-armhf.deb
-dpkg -i atikccdsdk-1.1-v7-armhf.deb
-
-************* SETUP **********************
-cd /home/pi/lin_guider_pack/lin_guider/
-./lin_guider
-Setup > Video Settings > Device
-Setup > Video Settings > Expo
-Setup > Video Settings > Frame
-Setup > Pulse Device Settings > Device
-Setup > General Settings > Check "drift data"
-Setup > General Settings > Dithering timeout = 10 sec
-Processing > Calibration > Check "auto mode" and "two axis" (if guiding both axes)
 
 
 

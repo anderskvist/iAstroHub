@@ -1,0 +1,11 @@
+--- guider.h	2016-04-25 08:58:47.000000000 +0000
++++ guider.h.new	2017-04-10 01:03:38.000000000 +0000
+@@ -67,7 +67,7 @@
+ 	bool is_guiding( void ) const;
+ 	void set_math( cgmath *math );
+ 
+-protected slots:
++public slots:	// changed for iAstroHub
+ 	void onXscaleChanged( int i );
+ 	void onYscaleChanged( int i );
+ 	void onSquareSizeChanged( int index );

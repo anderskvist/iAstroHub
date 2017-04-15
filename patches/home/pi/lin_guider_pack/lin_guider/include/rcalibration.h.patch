@@ -1,0 +1,11 @@
+--- rcalibration.h	2016-04-25 08:58:47.000000000 +0000
++++ rcalibration.h.new	2017-04-10 01:03:38.000000000 +0000
+@@ -51,7 +51,7 @@
+     void update_reticle_pos( double x, double y );
+     void set_math( cgmath *math );
+ 
+-protected slots:
++public slots:	// Changed from protected to public for iAstroHub
+ 	void onSquareSizeChanged( int index );
+ 	void onTwoAxisMode( int state );
+ 	void onEnableAutoMode( int state );

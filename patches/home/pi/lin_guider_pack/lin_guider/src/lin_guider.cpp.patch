@@ -1,0 +1,204 @@
+--- lin_guider.cpp	2016-04-25 08:58:47.000000000 +0000
++++ lin_guider.cpp.new	2017-04-10 01:03:38.000000000 +0000
+@@ -153,7 +153,7 @@
+ 		break;
+ 	case io_drv::DT_SKYWATCHER:
+ 		m_driver = new io_drv::cio_driver_skywatcher();
+-		break;
++		break;		
+ 	default:
+ 		m_driver = new io_drv::cio_driver_null( true );
+ 
+@@ -785,6 +785,192 @@
+ 		}
+ 	}
+ 	break;
++       /* Add to support iAstroHub, by Anat & Zachary */
++       case server::START_AUTOGUIDING:
++       {
++               answer_sz = snprintf( answer, answer_sz_max, "Autoguiding Started" );
++
++               reticle_wnd->close();
++               guider_wnd->close();
++
++               onShowGuiding();
++               guider_wnd->onStartStopButtonClick();
++       }
++               break;
++
++       case server::STOP_AUTOGUIDING:
++       {
++               answer_sz = snprintf( answer, answer_sz_max, "Autoguiding Stopped" );
++
++               guider_wnd->close();
++
++       }
++               break;
++
++       case server::START_CALIBRATION:
++       {
++               answer_sz = snprintf( answer, answer_sz_max, "Calibration Started" );
++
++               reticle_wnd->close();
++               guider_wnd->close();
++
++               m_calibration_params.auto_mode = true;
++
++               onShowCalibration();
++               reticle_wnd->onStartReticleCalibrationButtonClick();
++       }
++               break;
++
++       case server::STOP_CALIBRATION:
++       {
++               answer_sz = snprintf( answer, answer_sz_max, "Calibration Stopped" );
++
++               reticle_wnd->close();
++
++       }
++               break;
++
++       case server::FINDSTAR:
++       {
++               answer_sz = snprintf( answer, answer_sz_max, "Find Star" );
++
++               reticle_wnd->onFindStarButtonClick();
++
++       }
++               break;
++
++       case server::SET_VIDEO_GAIN:
++       {
++
++               video_drv::post_param_t prm;
++               video_drv::param_val_t val;
++               memset( &prm, 0, sizeof(video_drv::post_param_t) );
++
++               long newgain;
++               u_make_safe_str( (const char*)data, data_sz, sizeof(data_str), data_str, &data_str_len );
++               newgain = strtol( data_str, NULL, NULL );
++
++               answer_sz = snprintf( answer, answer_sz_max, "Setting video gain" );
++
++               m_capture_params = m_video->get_capture_params();
++
++               m_capture_params.gain = newgain;
++
++               val.set( m_capture_params.gain );
++               m_video->pack_params( video_drv::CI_GAIN, val, &prm );
++               m_video->post_params( prm );
++
++       }
++               break;
++
++
++       case server::SET_FPS:
++       {
++
++               video_drv::post_param_t prm;
++               video_drv::param_val_t val;
++               memset( &prm, 0, sizeof(video_drv::post_param_t) );
++
++               video_drv::current_format_state_t format_state;
++               video_drv::time_fract tmp;
++
++               long index_fps;
++               u_make_safe_str( (const char*)data, data_sz, sizeof(data_str), data_str, &data_str_len );
++               index_fps = strtol( data_str, NULL, NULL );
++
++               answer_sz = snprintf( answer, answer_sz_max, "Setting FPS" );
++
++               m_capture_params = m_video->get_capture_params();
++
++               format_state = m_video->get_current_format_params();
++
++               tmp = format_state.format_desc->frame_table[format_state.frame_idx].fps_table[index_fps];
++
++               if( m_capture_params.fps != tmp )
++               {
++                       val.set( tmp.numerator, tmp.denominator );
++
++                       m_video->pack_params( video_drv::CI_FPS, val, &prm );
++                       // send params to video thread
++                       m_video->post_params( prm );
++               }
++
++               m_capture_params.fps = tmp;
++
++       }
++               break;
++
++       case server::SET_GAIN_P:
++       {
++               cproc_in_params *in_params;
++
++               in_params   = m_math->get_in_params();
++
++               answer_sz = snprintf( answer, answer_sz_max, "Setting P gain" );
++
++               u_make_safe_str( (const char*)data, data_sz, sizeof(data_str), data_str, &data_str_len );
++
++                       // parse coords
++                       double newx_p, newy_p;
++                       unsigned int parsed = 0, arg_len = 0;
++                       const char *arg = NULL;
++                       for( int n = 0; u_memtok( data_str, data_str_len, ' ', &arg, &arg_len, &parsed ) && n < 2; n++ )
++                       {
++                               switch( n )
++                               {
++                               case 0: // x
++                                       newx_p = strtod( arg, NULL );
++                                       break;
++                               case 1: // y
++                                       newy_p = strtod( arg, NULL );
++                                       break;
++                               default:
++                                       continue;
++                               }
++                       }
++
++               in_params->proportional_gain[RA] = newx_p;
++               in_params->proportional_gain[DEC] = newy_p;
++
++       }
++               break;
++
++
++       case server::GET_GAIN_P:
++       {
++
++               FILE *ptout;
++               float xgain, ygain;
++
++               cproc_in_params *in_params;
++
++               in_params   = m_math->get_in_params();
++
++               answer_sz = snprintf( answer, answer_sz_max, "Getting P gain" );
++
++               xgain = in_params->proportional_gain[RA];
++               ygain = in_params->proportional_gain[DEC];
++               ptout=fopen("/home/pi/www/get_gain.txt","w");
++               fprintf(ptout,"%.1f %.1f\n",xgain,ygain);
++               fclose(ptout);
++
++       }
++               break;
++
++
++       case server::MOVE_RETICLE:
++       {
++
++               double pos_x, pos_y;
++               m_math->get_star_screen_pos( &pos_x, &pos_y );
++               m_math->set_reticle_params( pos_x, pos_y, -1 );
++
++               answer_sz = snprintf( answer, answer_sz_max, "Reticle moved" );
++
++       }
++               break;
++       /* iAstroHub patch ends */
++
+ 	default:
+ 		// write some strange answer
+ 		answer_sz = snprintf( answer, answer_sz_max, "Unknown command" );

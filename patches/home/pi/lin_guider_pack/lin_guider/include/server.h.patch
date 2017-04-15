@@ -1,0 +1,21 @@
+--- server.h	2016-04-25 08:58:47.000000000 +0000
++++ server.h.new	2017-04-10 01:03:38.000000000 +0000
+@@ -220,6 +220,18 @@
+ 		SET_GUIDER_SQUARE_POS,
+ 		SAVE_FRAME,
+ 		DITHER,
++		/* Add to support iAstroHub, by Anat & Zachary */
++		START_AUTOGUIDING, 
++		STOP_AUTOGUIDING,
++        START_CALIBRATION,
++		STOP_CALIBRATION,
++        FINDSTAR,
++		SET_VIDEO_GAIN,
++		SET_FPS,
++		SET_GAIN_P,
++		GET_GAIN_P,
++		MOVE_RETICLE,
++		/* iAstroHub patch ends */
+ 		DITHER_NO_WAIT_XY,
+ 		GET_DISTANCE,
+ 		SAVE_FRAME_DECORATED

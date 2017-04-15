@@ -1,0 +1,24 @@
+--- server.cpp	2016-04-25 08:58:47.000000000 +0000
++++ server.cpp.new	2017-04-10 01:03:38.000000000 +0000
+@@ -108,7 +108,20 @@
+ 	m_cmd_names.insert( std::make_pair( server::DITHER, "DITHER" ) );
+ 	m_cmd_names.insert( std::make_pair( server::DITHER_NO_WAIT_XY, "DITHER_NO_WAIT_XY" ) );
+ 	m_cmd_names.insert( std::make_pair( server::GET_DISTANCE, "GET_DISTANCE" ) );
+-	m_cmd_names.insert( std::make_pair( server::SAVE_FRAME_DECORATED, "SAVE_FRAME_DECORATED" ) );
++	/* Added to support iAstroHub, by Anat & Zachary */
++	m_cmd_names.insert( std::make_pair( server::START_AUTOGUIDING, "START_AUTOGUIDING" ) );
++	m_cmd_names.insert( std::make_pair( server::STOP_AUTOGUIDING, "STOP_AUTOGUIDING" ) );
++	m_cmd_names.insert( std::make_pair( server::START_CALIBRATION, "START_CALIBRATION" ) );
++	m_cmd_names.insert( std::make_pair( server::STOP_CALIBRATION, "STOP_CALIBRATION" ) );
++	m_cmd_names.insert( std::make_pair( server::FINDSTAR, "FINDSTAR" ) );
++	m_cmd_names.insert( std::make_pair( server::SET_VIDEO_GAIN, "SET_VIDEO_GAIN" ) );
++	m_cmd_names.insert( std::make_pair( server::SET_FPS, "SET_FPS" ) );
++	m_cmd_names.insert( std::make_pair( server::SET_GAIN_P, "SET_GAIN_P" ) );
++	m_cmd_names.insert( std::make_pair( server::GET_GAIN_P, "GET_GAIN_P" ) );
++	m_cmd_names.insert( std::make_pair( server::MOVE_RETICLE, "MOVE_RETICLE" ) );
++	/* iAstroHub patch ends */
++        m_cmd_names.insert( std::make_pair( server::SAVE_FRAME_DECORATED, "SAVE_FRAME_DECORATED" ) );
++	
+ }
+ 
+ 

@@ -177,3 +177,47 @@ WORKDIR /home/pi/OpenSkyImager/build
 RUN cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
 RUN make install
 WORKDIR /
+
+# 18. Lin_guider
+WORKDIR /home/pi
+RUN wget https://sourceforge.net/projects/cccd/files/firmware/firmware-ccd_1.3_all.deb
+RUN dpkg -i firmware-ccd_1.3_all.deb
+# Asic drivers for Raspbian/arm
+RUN uname -a | grep arm && wget https://sourceforge.net/projects/linguider/files/asi_sdk/lg_4.0.0/libasicamera-0.3.0623-armhf.deb || true
+RUN uname -a | grep arm && dpkg -i libasicamera-0.3.0623-armhf.deb || true
+RUN uname -a | grep arm && wget https://sourceforge.net/projects/linguider/files/atik_sdk/lg_3.3.0-4.0.0/atikccdsdk-1.1-v7-armhf.deb || true
+RUN uname -a | grep arm && dpkg -i atikccdsdk-1.1-v7-armhf.deb || true
+# Asic drivers for Debian/x64
+RUN uname -a | grep x86_64 && wget https://sourceforge.net/projects/linguider/files/asi_sdk/lg_4.0.0/libasicamera-0.3.0623-amd64.deb || true
+RUN uname -a | grep x86_64 && dpkg -i libasicamera-0.3.0623-amd64.deb || true
+RUN uname -a | grep x86_64 && wget https://sourceforge.net/projects/linguider/files/atik_sdk/lg_3.3.0-4.0.0/atikccdsdk-1.1-amd64.deb || true
+RUN uname -a | grep x86_64 && dpkg -i atikccdsdk-1.1-amd64.deb || true
+RUN wget https://sourceforge.net/projects/linguider/files/3.3.0/lin_guider-3.3.0.tar.bz2
+RUN wget https://sourceforge.net/projects/libnexstar/files/libnexstar-0.15.tar.gz
+RUN apt-get -y install \
+  fxload \
+  libftdi-dev \
+  libqt4-dev \
+  libusb-1.0-0-dev
+RUN tar -xvf libnexstar-0.15.tar.gz
+WORKDIR /home/pi/libnexstar-0.15/
+RUN ./configure
+RUN make
+RUN make install
+WORKDIR /home/pi
+RUN tar -xvf lin_guider-3.3.0.tar.bz2
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/lin_guider.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/rcalibration.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/server.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/include/guider.h; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/include/rcalibration.h; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/include/server.h; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_asi.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_atik.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_qhy5ii.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_qhy6.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_sx.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION
+WORKDIR /home/pi/lin_guider_pack/lin_guider
+RUN ./configure
+RUN make
+WORKDIR /

@@ -1,0 +1,314 @@
+--- rcalibration.cpp	2016-04-25 08:58:47.000000000 +0000
++++ rcalibration.cpp.new	2017-04-10 01:03:38.000000000 +0000
+@@ -279,10 +279,18 @@
+ 
+ void rcalibration::onStartReticleCalibrationButtonClick()
+ {
++	FILE *pt;	// The file is for iAstroHub outputing to web UI.
++
+ 	if( !check_start_position() )
+ 	{
+ 		log_i( "Start point is too close to matrix edge(s)" );
+-		u_msg( "Start point is too close to matrix edge(s)" );
++		// u_msg( "Start point is too close to matrix edge(s)" );  <- comment by Anat
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","w");
++        fprintf(pt,"Start point is too close to edge(s).+++++\n");
++        fclose(pt);
++		/* iAstroHub patch ends */
++	
+ 		return;
+ 	}
+ 
+@@ -437,6 +445,7 @@
+ 	bool auto_term_ok = false;
+ 	int turn_back_time;
+ 	int cnt;
++	FILE *pt;	// The file is for iAstroHub.
+ 
+ 	if( !pmath )
+ 		return;
+@@ -453,6 +462,11 @@
+ 	ui.progressBar->setValue( 0 );
+ 	ui.pushButton_StartCalibration->setEnabled( false );
+ 	ui.l_RStatus->setText( tr("State: drifting...") );
++	/* Add to support iAstroHub, by Anat & Zachary */
++	pt=fopen("/home/pi/www/calibrating.txt","w");
++	fprintf(pt,"State: drifting...\n");
++	fclose(pt);
++	/* iAstroHub patch ends */
+ 	ui.groupBox_VideoCalibration->setEnabled( false );
+ 
+ 	// drop info
+@@ -483,6 +497,11 @@
+ 		{
+ 			pmain_wnd->m_driver->reset();
+ 			log_i( "Star is near matrix edge. Stopping drive" );
++			/* Add to support iAstroHub, by Anat & Zachary */
++			pt=fopen("/home/pi/www/calibrating.txt","a");
++			fprintf(pt,"Star is near the edge. Stopping drive\n");
++			fclose(pt);
++			/* iAstroHub patch ends */
+ 			break;
+ 		}
+ 	}
+@@ -495,6 +514,11 @@
+ 	pmain_wnd->m_driver->do_pulse( io_drv::RA_DEC_DIR, turn_back_time*1000 );
+ 
+ 	ui.l_RStatus->setText( tr("State: running...") );
++	/* Add to support iAstroHub, by Anat & Zachary */
++	pt=fopen("/home/pi/www/calibrating.txt","a");
++	fprintf(pt,"State: running back...\n");
++	fclose(pt);
++	/* iAstroHub patch ends */
+ 
+ 	double phi = pmath->calc_phi( start_x1, start_y1, end_x1, end_y1 );
+ 	Matrix ROT_Z = RotateZ( -M_PI*phi/180.0 ); // derotates...
+@@ -525,6 +549,11 @@
+ 		{
+ 			pmain_wnd->m_driver->reset();
+ 			auto_term_ok = true;
++			/* Add to support iAstroHub, by Anat & Zachary */
++			pt=fopen("/home/pi/www/calibrating.txt","a");
++			fprintf(pt,"State: Start point reached...\n");
++			fclose(pt);
++			/* iAstroHub patch ends */
+ 			break;
+ 		}
+ 		//----- Z-check end -----
+@@ -532,18 +561,35 @@
+ 	ra_drift_tm = std::max( cur - start_time, ra_drift_tm );
+ 
+ 	if( !auto_term_ok )
+-		QMessageBox::warning( this, tr("Warning"), tr("RA: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );
++	{
++		// QMessageBox::warning( this, tr("Warning"), tr("RA: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );  <- Comment by Anat
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"Warning: Scope can't reach the start point! Possible mount or drive problems...\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
++	}
+ 
+ 	// calc orientation
+ 	if( pmath->calc_and_set_reticle( start_x1, start_y1, end_x1, end_y1, ra_drift_tm ) )
+ 	{
+ 		fill_interface();
+ 		ui.l_RStatus->setText( tr("State: DONE") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"State: DONE +++++\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 	}
+ 	else
+ 	{
+ 		ui.l_RStatus->setText( tr("State: ERR") );
+-		QMessageBox::warning( this, tr("Error"), tr("Calibration rejected. Start drift is too short."), QMessageBox::Ok );
++		// QMessageBox::warning( this, tr("Error"), tr("Calibration rejected. Start drift is too short."), QMessageBox::Ok );  <- Comment by Anat
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"Error: Calibration rejected. Start drift is too short.+++++\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 	}
+ 
+ 	ui.checkBox_TwoAxis->setEnabled( true );
+@@ -562,6 +608,8 @@
+ 	bool auto_term_ok = false;
+ 	int turn_back_time;
+ 	int cnt;
++	FILE *pt;	// The file is for iAstroHub.
++
+ 
+ 	if( !pmath )
+ 		return;
+@@ -585,6 +633,11 @@
+ 	//----- RA axis -----
+ 	{
+ 		ui.l_RStatus->setText( tr("State: RA drifting...") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","w");
++        fprintf(pt,"State: RA drifting...\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 		
+ 		// get start point by
+ 		pmath->get_star_screen_pos( &start_x1, &start_y1 );
+@@ -611,6 +664,11 @@
+ 			{
+ 				pmain_wnd->m_driver->reset();
+ 				log_i( "Star is near matrix edge. Stopping drive" );
++				/* Add to support iAstroHub, by Anat & Zachary */
++				pt=fopen("/home/pi/www/calibrating.txt","a");
++				fprintf(pt,"RA: Star is near the edge. Stopping drive\n");
++				fclose(pt);
++				/* iAstroHub patch ends */
+ 				break;
+ 			}
+ 		}
+@@ -623,6 +681,11 @@
+ 		pmain_wnd->m_driver->do_pulse( io_drv::RA_DEC_DIR, turn_back_time*1000 );
+ 
+ 		ui.l_RStatus->setText( tr("State: RA running back...") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"State: RA running back...\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 
+ 		double phi = pmath->calc_phi( start_x1, start_y1, end_x1, end_y1 );
+ 		Matrix ROT_Z = RotateZ( -M_PI*phi/180.0 ); // derotates...
+@@ -653,6 +716,11 @@
+ 			{
+ 				pmain_wnd->m_driver->reset();
+ 				auto_term_ok = true;
++				/* Add to support iAstroHub, by Anat & Zachary */
++				pt=fopen("/home/pi/www/calibrating.txt","a");
++				fprintf(pt,"State: RA: Start point reached...\n");
++				fclose(pt);
++				/* iAstroHub patch ends */
+ 				break;
+ 			}
+ 			//----- Z-check end -----
+@@ -660,12 +728,24 @@
+ 		ra_drift_tm = std::max( cur - start_time, ra_drift_tm );
+ 
+ 		if( !auto_term_ok )
+-			QMessageBox::warning( this, tr("Warning"), tr("RA: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );
++		{
++			// QMessageBox::warning( this, tr("Warning"), tr("RA: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );  <- Comment by Anat
++			/* Add to support iAstroHub, by Anat & Zachary */
++			pt=fopen("/home/pi/www/calibrating.txt","a");
++			fprintf(pt,"Warning: RA: Scope can't reach the start point! Possible mount or drive problems...\n");
++			fclose(pt);
++			/* iAstroHub patch ends */
++		}
+ 	}
+ 
+ 	//----- DEC axis -----
+ 	{
+ 		ui.l_RStatus->setText( tr("State: DEC drifting...") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"State: DEC drifting...\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 		
+ 		// get start point by
+ 		pmath->get_star_screen_pos( &start_x2, &start_y2 );
+@@ -692,6 +772,11 @@
+ 			{
+ 				pmain_wnd->m_driver->reset();
+ 				log_i( "Star is near matrix edge. Stopping drive" );
++				/* Add to support iAstroHub, by Anat & Zachary */
++				pt=fopen("/home/pi/www/calibrating.txt","a");
++				fprintf(pt,"DEC: Star is near the edge. Stopping drive\n");
++				fclose(pt);
++				/* iAstroHub patch ends */
+ 				break;
+ 			}
+ 		}
+@@ -704,6 +789,11 @@
+ 		pmain_wnd->m_driver->do_pulse( io_drv::DEC_DEC_DIR, turn_back_time*1000 );
+ 
+ 		ui.l_RStatus->setText( tr("State: DEC running back...") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"State: DEC running back...\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 
+ 		double phi = pmath->calc_phi( start_x2, start_y2, end_x2, end_y2 );
+ 		Matrix ROT_Z = RotateZ( -M_PI*phi/180.0 ); // derotates...
+@@ -734,6 +824,11 @@
+ 			{
+ 				pmain_wnd->m_driver->reset();
+ 				auto_term_ok = true;
++				/* Add to support iAstroHub, by Anat & Zachary */
++				pt=fopen("/home/pi/www/calibrating.txt","a");
++				fprintf(pt,"State: DEC: Start point reached...\n");
++				fclose(pt);
++				/* iAstroHub patch ends */
+ 				break;
+ 			}
+ 			//----- Z-check end -----
+@@ -741,10 +836,22 @@
+ 		dec_drift_tm = std::max( cur - start_time, dec_drift_tm );
+ 
+ 		if( !auto_term_ok )
+-			QMessageBox::warning( this, tr("Warning"), tr("DEC: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );
++		{
++			// QMessageBox::warning( this, tr("Warning"), tr("DEC: Scope can't reach the start point in ") + QString().number(turn_back_time) + tr("secs.\nPossible mount or drive problems..."), QMessageBox::Ok );  <- Comment by Anat
++			/* Add to support iAstroHub, by Anat & Zachary */
++			pt=fopen("/home/pi/www/calibrating.txt","a");
++			fprintf(pt,"Warning: DEC: Scope can't reach the start point! Possible mount or drive problems...\n");
++			fclose(pt);
++			/* iAstroHub patch ends */
++		}
+ 	}
+ 
+ 	log_i("RA: sx1=%f sy1=%f ex1=%f ey1=%f DEC: sx2=%f sy2=%f ex2=%f ey2=%f", start_x1, start_y1, end_x1, end_y1, start_x2, start_y2, end_x2, end_y2);
++	/* Add to support iAstroHub, by Anat & Zachary */
++	pt=fopen("/home/pi/www/calibrating.txt","a");
++	fprintf(pt,"RA: sx1=%f sy1=%f ex1=%f ey1=%f DEC: sx2=%f sy2=%f ex2=%f ey2=%f\n", start_x1, start_y1, end_x1, end_y1, start_x2, start_y2, end_x2, end_y2);
++	fclose(pt);
++	/* iAstroHub patch ends */
+ 
+ 	// calc orientation
+ 	bool swap_dec = false;
+@@ -754,15 +861,30 @@
+ 		{
+ 			pmain_wnd->m_driver->swap_dec_bits();
+ 			log_i( "DEC control bits swapped" );
++			/* Add to support iAstroHub, by Anat & Zachary */
++			pt=fopen("/home/pi/www/calibrating.txt","a");
++			fprintf(pt,"DEC control bits swapped\n");
++			fclose(pt);
++			/* iAstroHub patch ends */
+ 		}
+ 
+ 		fill_interface();
+ 		ui.l_RStatus->setText( tr("State: DONE") );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"State: DONE +++++\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 	}
+ 	else
+ 	{
+ 		ui.l_RStatus->setText( tr("State: ERR") );
+-		QMessageBox::warning( this, tr("Error"), tr("Calibration rejected. Start drift is too short."), QMessageBox::Ok );
++		// QMessageBox::warning( this, tr("Error"), tr("Calibration rejected. Start drift is too short."), QMessageBox::Ok );  <- Comment by Anat
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/calibrating.txt","a");
++		fprintf(pt,"Error: Calibration rejected. Start drift is too short.+++++\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 	}
+ 
+ 	ui.checkBox_TwoAxis->setEnabled( true );
+@@ -788,6 +910,8 @@
+ 
+ void rcalibration::onFindStarButtonClick()
+ {
++	FILE *pt;	// The file is for iAstroHub.
++
+ 	std::vector< std::pair<Vector, double> > stars;
+ 
+ 	if( !pmath )
+@@ -796,7 +920,12 @@
+ 	bool res = pmath->find_stars( &stars );
+ 	if( !res )
+ 	{
+-		u_msg( "No suitable star in frame" );
++		// u_msg( "No suitable star in frame" );
++		/* Add to support iAstroHub, by Anat & Zachary */
++		pt=fopen("/home/pi/www/status_guidestar.txt","w");
++		fprintf(pt,"No suitable star in frame\n");
++		fclose(pt);
++		/* iAstroHub patch ends */
+ 		return;
+ 	}
+ 
