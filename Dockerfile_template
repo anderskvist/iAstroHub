@@ -79,3 +79,12 @@ RUN LOCATION=/etc/php5/cgi/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/cli/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/fpm/php.ini; patch -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/nginx/sites-available/default; patch -i /patches/$LOCATION.patch $LOCATION
+
+# 8. xvfb and vnc
+RUN apt-get -y install \
+  x11vnc \
+  xfonts-75dpi \
+  xfonts-cyrillic \
+  xfonts-scalable \
+  xvfb
+

@@ -197,12 +197,6 @@ root@raspberrypi:/home/pi# cat /sys/class/thermal/thermal_zone0/temp
 
 
 
-8. xvfb and vnc
-
-sudo apt-get install xvfb x11vnc xfonts-cyrillic xfonts-75dpi xfonts-scalable
-
-
-
 9. TCP to Serial
 
 sudo apt-get install ser2net socat
