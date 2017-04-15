@@ -223,18 +223,6 @@ sudo /etc/init.d/ser2net restart
 
 
 
-14. Dslrdashboard
-
-sudo apt-get install git build-essential pkg-config libusb-1.0-0-dev
-cd /home/pi/
-git clone git://github.com/hubaiz/DslrDashboardServer
-cd DslrDashboardServer/
-g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver
-chmod +x ddserver
-cp ddserver /home/pi/www/.
-
-
-
 15. gphoto2
 
 cd /home/pi/

@@ -127,3 +127,16 @@ RUN wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
 RUN wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
 RUN wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
 WORKDIR /
+
+# 14. Dslrdashboard
+RUN apt-get -y install \
+  build-essential \
+  git \
+  libusb-1.0-0-dev \
+  pkg-config
+RUN git clone https://github.com/hubaiz/DslrDashboardServer.git /home/pi/DslrDashboardServer
+WORKDIR /home/pi/DslrDashboardServer
+RUN g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver
+RUN chmod +x ./ddserver
+RUN cp ./ddserver /home/pi/www/
+WORKDIR /
