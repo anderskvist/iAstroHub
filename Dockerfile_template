@@ -157,28 +157,12 @@ RUN make
 RUN make install
 WORKDIR /
 
-# 19. OpenSkyImager
-RUN apt-get -y install \
-  cmake \
-  fxload \
-  imagemagick \
-  libcfitsio3-dev \
-  libglib2.0-0 \
-  libglib2.0-dev\
-  libgtk2.0-0 \
-  libgtk2.0-dev \
-  libudev-dev
-RUN git clone --depth 1 http://github.com/OpenSkyProject/OpenSkyImager.git /home/pi/OpenSkyImager
-RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgPixbuf.c; patch -b -i /patches/$LOCATION.patch $LOCATION
-RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgWFuncs.c; patch -b -i /patches/$LOCATION.patch $LOCATION
-RUN LOCATION=/home/pi/OpenSkyImager/sbig/install_sbig.bash; patch -b -i /patches/$LOCATION.patch $LOCATION
-RUN mkdir /home/pi/OpenSkyImager/build
-WORKDIR /home/pi/OpenSkyImager/build
-RUN cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
-RUN make install
-WORKDIR /
-
 # 18. Lin_guider
+RUN apt-get -y install \
+  fxload \
+  libftdi-dev \
+  libqt4-dev \
+  libusb-1.0-0-dev
 WORKDIR /home/pi
 RUN wget https://sourceforge.net/projects/cccd/files/firmware/firmware-ccd_1.3_all.deb
 RUN dpkg -i firmware-ccd_1.3_all.deb
@@ -194,11 +178,6 @@ RUN uname -a | grep x86_64 && wget https://sourceforge.net/projects/linguider/fi
 RUN uname -a | grep x86_64 && dpkg -i atikccdsdk-1.1-amd64.deb || true
 RUN wget https://sourceforge.net/projects/linguider/files/3.3.0/lin_guider-3.3.0.tar.bz2
 RUN wget https://sourceforge.net/projects/libnexstar/files/libnexstar-0.15.tar.gz
-RUN apt-get -y install \
-  fxload \
-  libftdi-dev \
-  libqt4-dev \
-  libusb-1.0-0-dev
 RUN tar -xvf libnexstar-0.15.tar.gz
 WORKDIR /home/pi/libnexstar-0.15/
 RUN ./configure
@@ -220,4 +199,25 @@ RUN LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_sx.cpp; pat
 WORKDIR /home/pi/lin_guider_pack/lin_guider
 RUN ./configure
 RUN make
+WORKDIR /
+
+# 19. OpenSkyImager
+RUN apt-get -y install \
+  cmake \
+  fxload \
+  imagemagick \
+  libcfitsio3-dev \
+  libglib2.0-0 \
+  libglib2.0-dev\
+  libgtk2.0-0 \
+  libgtk2.0-dev \
+  libudev-dev
+RUN git clone --depth 1 http://github.com/OpenSkyProject/OpenSkyImager.git /home/pi/OpenSkyImager
+RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgPixbuf.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgWFuncs.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/OpenSkyImager/sbig/install_sbig.bash; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN mkdir /home/pi/OpenSkyImager/build
+WORKDIR /home/pi/OpenSkyImager/build
+RUN cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
+RUN make install
 WORKDIR /
