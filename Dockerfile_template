@@ -4,6 +4,28 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
+# Download Astrometry data set as early as possible in Docker cache to minimize
+# the chance of it being invalidated.
+RUN mkdir -p /usr/local/astrometry/data/
+WORKDIR /usr/local/astrometry/data/
+RUN apt-get -y install wget
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
+RUN wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
+WORKDIR /
+
 # 5. Install tools
 RUN apt-get -y install \
   aptitude \
@@ -65,6 +87,25 @@ WORKDIR /
 RUN apt-get -y install sudo
 RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
 
+# 8. xvfb and vnc
+RUN apt-get -y install \
+  x11vnc \
+  xfonts-75dpi \
+  xfonts-cyrillic \
+  xfonts-scalable \
+  xvfb
+
+# 15. gphoto2
+WORKDIR /home/pi
+RUN wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh
+RUN chmod +x ./gphoto2-updater.sh
+RUN ./gphoto2-updater.sh --stable
+WORKDIR /
+
+# Copy patches as late as we can in the Docker cache, as any changes will cause
+# an invalidation.
+COPY patches /patches
+
 # 7. Webserver
 COPY www /home/pi/www
 RUN chmod -R 777 /home/pi/www
@@ -74,19 +115,23 @@ RUN apt-get -y install \
   php5-cli \
   php5-common \
   php5-fpm
-COPY patches /patches
 RUN LOCATION=/etc/php5/cgi/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/cli/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/fpm/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/nginx/sites-available/default; patch -b -i /patches/$LOCATION.patch $LOCATION
 
-# 8. xvfb and vnc
+# 14. Dslrdashboard
 RUN apt-get -y install \
-  x11vnc \
-  xfonts-75dpi \
-  xfonts-cyrillic \
-  xfonts-scalable \
-  xvfb
+  build-essential \
+  git \
+  libusb-1.0-0-dev \
+  pkg-config
+RUN git clone https://github.com/hubaiz/DslrDashboardServer.git /home/pi/DslrDashboardServer
+WORKDIR /home/pi/DslrDashboardServer
+RUN g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver
+RUN chmod +x ./ddserver
+RUN cp ./ddserver /home/pi/www/
+WORKDIR /
 
 # 13. Astrometry
 RUN apt-get -y install \
@@ -110,40 +155,5 @@ RUN LOCATION=/home/pi/astrometry.net-0.40/util/starutil.c; patch -b -i /patches/
 WORKDIR /home/pi/astrometry.net-0.40
 RUN make
 RUN make install
-WORKDIR /usr/local/astrometry/data/
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
 WORKDIR /
 
-# 14. Dslrdashboard
-RUN apt-get -y install \
-  build-essential \
-  git \
-  libusb-1.0-0-dev \
-  pkg-config
-RUN git clone https://github.com/hubaiz/DslrDashboardServer.git /home/pi/DslrDashboardServer
-WORKDIR /home/pi/DslrDashboardServer
-RUN g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver
-RUN chmod +x ./ddserver
-RUN cp ./ddserver /home/pi/www/
-WORKDIR /
-
-# 15. gphoto2
-WORKDIR /home/pi
-RUN wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh
-RUN chmod +x ./gphoto2-updater.sh
-RUN ./gphoto2-updater.sh --stable
-WORKDIR /
