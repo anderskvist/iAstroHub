@@ -221,19 +221,6 @@ root@raspberrypi:/home/pi# cat /sys/class/thermal/thermal_zone0/temp
 
 
 
-9. TCP to Serial
-
-sudo apt-get install ser2net socat
-
-sudo nano /etc/ser2net.conf
-************************ ADD ***************************
-3300:raw:0:/dev/ttyUSB0:9600 NONE 1STOPBIT 8DATABITS
-3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS
-
-sudo /etc/init.d/ser2net restart
-
-
-
 17. FTDI modules
 
 mv /lib/modules/4.4.13-v7+/kernel/drivers/usb/serial/ftdi_sio.ko /home/pi/.

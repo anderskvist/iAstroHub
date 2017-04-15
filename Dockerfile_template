@@ -221,3 +221,14 @@ WORKDIR /home/pi/OpenSkyImager/build
 RUN cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
 RUN make install
 WORKDIR /
+
+# 9. TCP to Serial
+RUN apt-get -y install ser2net socat
+RUN echo "3300:raw:0:/dev/ttyUSB0:9600 NONE 1STOPBIT 8DATABITS" >> /etc/ser2net.conf
+RUN echo "3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS" >> /etc/ser2net.conf
+
+# Create a startup script to run all our services
+RUN echo "#!/usr/bin/env sh" > /start.sh
+RUN echo "service ser2net start" >> /start.sh
+RUN chmod +x /start.sh
+CMD ["/start.sh"]
