@@ -37,15 +37,15 @@ The following steps are not yet automated, and so must be run by hand on the fin
 
 #### Lin_guider
 
-cd /home/pi/lin_guider_pack/lin_guider/
-./lin_guider
-Setup > Video Settings > Device
-Setup > Video Settings > Expo
-Setup > Video Settings > Frame
-Setup > Pulse Device Settings > Device
-Setup > General Settings > Check "drift data"
-Setup > General Settings > Dithering timeout = 10 sec
-Processing > Calibration > Check "auto mode" and "two axis" (if guiding both axes)
+* cd /home/pi/lin_guider_pack/lin_guider/
+* ./lin_guider
+* Setup > Video Settings > Device
+* Setup > Video Settings > Expo
+* Setup > Video Settings > Frame
+* Setup > Pulse Device Settings > Device
+* Setup > General Settings > Check "drift data"
+* Setup > General Settings > Dithering timeout = 10 sec
+* Processing > Calibration > Check "auto mode" and "two axis" (if guiding both axes)
 
 ## Dockerization Notes and Changes
 
