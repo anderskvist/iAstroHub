@@ -140,3 +140,10 @@ RUN g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libu
 RUN chmod +x ./ddserver
 RUN cp ./ddserver /home/pi/www/
 WORKDIR /
+
+# 15. gphoto2
+WORKDIR /home/pi
+RUN wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh
+RUN chmod +x ./gphoto2-updater.sh
+RUN ./gphoto2-updater.sh --stable
+WORKDIR /

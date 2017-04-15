@@ -223,15 +223,6 @@ sudo /etc/init.d/ser2net restart
 
 
 
-15. gphoto2
-
-cd /home/pi/
-wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh
-chmod 777 gphoto2-updater.sh
-./gphoto2-updater.sh -s
-
-
-
 17. FTDI modules
 
 mv /lib/modules/4.4.13-v7+/kernel/drivers/usb/serial/ftdi_sio.ko /home/pi/.
