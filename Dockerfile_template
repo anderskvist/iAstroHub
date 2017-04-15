@@ -157,3 +157,23 @@ RUN make
 RUN make install
 WORKDIR /
 
+# 19. OpenSkyImager
+RUN apt-get -y install \
+  cmake \
+  fxload \
+  imagemagick \
+  libcfitsio3-dev \
+  libglib2.0-0 \
+  libglib2.0-dev\
+  libgtk2.0-0 \
+  libgtk2.0-dev \
+  libudev-dev
+RUN git clone --depth 1 http://github.com/OpenSkyProject/OpenSkyImager.git /home/pi/OpenSkyImager
+RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgPixbuf.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgWFuncs.c; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN LOCATION=/home/pi/OpenSkyImager/sbig/install_sbig.bash; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN mkdir /home/pi/OpenSkyImager/build
+WORKDIR /home/pi/OpenSkyImager/build
+RUN cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
+RUN make install
+WORKDIR /

@@ -1,0 +1,11 @@
+--- imgPixbuf.c	2017-04-14 12:21:49.865814307 +0000
++++ imgPixbuf.c.new	2017-04-14 12:23:14.455234932 +0000
+@@ -51,7 +51,7 @@
+ 	
+ 	if (loaded)
+ 	{
+-		retval = (gdk_pixbuf_save(pixbuf, path, "jpeg", NULL, "quality", "50", NULL) == TRUE); 
++		retval = (gdk_pixbuf_save(pixbuf, path, "jpeg", NULL, "quality", "85", NULL) == TRUE); 
+ 	}
+ 	return (retval);
+ }

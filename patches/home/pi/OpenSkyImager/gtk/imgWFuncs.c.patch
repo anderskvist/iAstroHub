@@ -1,0 +1,21 @@
+--- imgWFuncs.c	2017-04-14 12:21:49.865814307 +0000
++++ imgWFuncs.c.new	2017-04-14 12:27:53.263723222 +0000
+@@ -296,6 +296,8 @@
+ void load_image_from_data()
+ {
+ 	int retval = 0;
++	char buff[100];
++	time_t now = time(0);
+ 	
+ 	g_rw_lock_reader_lock(&thd_caplock);
+ 	if (imgfit_loaded())
+@@ -331,7 +333,8 @@
+ 				
+ 		if ((fifomode) && (retval))
+ 		{
+-			printf("Fifo: PREVIEW=New preview image available\n");
++			strftime(buff, 100, "%Y-%m-%d %H:%M:%S", localtime(&now));
++			printf("Fifo: PREVIEW=New preview image available\t%s\n", buff);
+ 		}
+ 
+ 		if (retval == 1)

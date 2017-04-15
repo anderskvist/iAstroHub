@@ -1,0 +1,13 @@
+--- install_sbig.bash	2017-04-14 12:21:49.895778679 +0000
++++ install_sbig.bash.new	2017-04-14 12:34:08.457606368 +0000
+@@ -2,6 +2,10 @@
+ #Collect parameters in named vars for ease of use
+ basedir=$1
+ cpu=`uname -p`
++if [[ $cpu == "unknown" ]]
++then
++	cpu=`/usr/bin/lscpu | /bin/grep "Architecture\:" | /bin/sed "s/Architecture\:\s\+//"`
++fi
+ bit=`getconf LONG_BIT`
+ if [[ $cpu == *arm* ]]
+ then

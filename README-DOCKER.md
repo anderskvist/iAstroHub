@@ -44,6 +44,7 @@ The following changes have been made while Dockerizing iAstroHub:
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
 * Astrometry compiled with updated gcc 4.9 suite rather than 4.4 suite.
+* Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files 
  
 ## Workflow Changes
 
@@ -290,111 +291,6 @@ Setup > Pulse Device Settings > Device
 Setup > General Settings > Check "drift data"
 Setup > General Settings > Dithering timeout = 10 sec
 Processing > Calibration > Check "auto mode" and "two axis" (if guiding both axes)
-
-
-
-19. OpenSkyImager
-REFERENCE: https://github.com/OpenSkyProject/OpenSkyImager
-
-sudo apt-get install libgtk2.0-0 libgtk2.0-dev libglib2.0-0 libglib2.0-dev libcfitsio3-dev libudev-dev fxload cmake imagemagick
-
-cd /home/pi/
-git clone git://github.com/OpenSkyProject/OpenSkyImager
-cd /home/pi/OpenSkyImager/
-
-
-nano /home/pi/OpenSkyImager/gtk/imgPixbuf.c
-***************
-retval = (gdk_pixbuf_save(pixbuf, path, "jpeg", NULL, "quality", "85", NULL) == TRUE);
-***************
-
-
-nano /home/pi/OpenSkyImager/gtk/imgWFuncs.c
-***************
-void load_image_from_data()
-{
-	int retval = 0;
-	
-    char buff[100];                     									<---------------
-    time_t now = time (0);                    								<---------------
-	
-	g_rw_lock_reader_lock(&thd_caplock);
-	if (imgfit_loaded())
-	{
-		// Set hourglass
-		//gdk_window_set_cursor(GDK_WINDOW(window->window), watchCursor);
-		// Ui update after byterpix
-		if (tmrimgrefresh != -1)
-		{
-			g_source_remove(tmrimgrefresh);
-		}
-		if (tmrfrmrefresh != -1)
-		{
-			g_source_remove(tmrfrmrefresh);
-		}
-		set_adu_limits(imgfit_get_bytepix());
-		
-		int debayer = gtk_combo_box_get_active(GTK_COMBO_BOX(cmb_debayer));
-		if (imgfit_internal() == 0)
-		{
-			// No debayer for captured frames if bin > 1
-			debayer = (imgcam_get_shpar()->bin == 1) ? debayer : 0;
-		}
-		if (fwhmv == 1)
-		{
-			fwhm_calc();
-		}
-		
-		// Actual pixbuffer load (thread safe)
-		g_rw_lock_writer_lock(&pixbuf_lock);
-		retval = imgpix_load(imgfit_get_data(), imgfit_get_width(), imgfit_get_height(), imgfit_get_bytepix(), debayer, scrmaxadu, scrminadu);
-		g_rw_lock_writer_unlock(&pixbuf_lock);
-				
-		if ((fifomode) && (retval))
-		{
-			strftime (buff, 100, "%Y-%m-%d %H:%M:%S", localtime (&now));		                <---------------
-			printf("Fifo: PREVIEW=New preview image available\t%s\n",buff);					    <---------------
-		}
-
-		if (retval == 1)
-		{	
-			tmrfrmrefresh = g_timeout_add(1, (GSourceFunc) tmr_frm_refresh, NULL);
-		}
-		else if (strlen(imgpix_get_msg()) != 0)
-		{
-			tmrfrmrefresh = g_timeout_add(1, (GSourceFunc) tmr_imgstatus_pixmsg, NULL);			
-		}
-		// Reset
-		//gdk_window_set_cursor(GDK_WINDOW(window->window), NULL);
-	}
-	g_rw_lock_reader_unlock(&thd_caplock);
-}
-***************
-
-
-nano /home/pi/OpenSkyImager/sbig/install_sbig.bash
-**********************************************************************
-#if [[ $cpu == *arm* ]]
-#then
-        sudo cp $basedir/arm-32/libsbigudrv.so /usr/lib/
-#else
-#       sudo cp $basedir/x86-$bit/libsbigudrv.so /usr/lib/
-#fi
-**********************************************************************
-
-
-mkdir build
-cd build
-sudo cmake -D FORCE_GTK2=on  -D FORCE_QHY_ONLY=off ..
-sudo make install
-
-cd /home/pi/OpenSkyImager/build/gtk/
-./gtkImager
-
-
-To change the SBIG library, replace this file  /usr/lib/libsbigudrv.so
-To change the Atik library, replace this file  /usr/lib/libatikccd.so
-To change the QHY firmware, replace the firmware in /etc/qhyccd/ and edit /etc/udev/rules.d/85-qhy.rules
 
 
 
