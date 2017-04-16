@@ -53,7 +53,6 @@ The following changes have been made while Dockerizing iAstroHub:
 
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
-* Astrometry compiled with updated gcc 4.9 suite rather than 4.4 suite.
 * Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
 * GoQat upgraded from 2.0.0 to 2.1.1; includes native support for INDI removeDevice.
  
@@ -63,11 +62,11 @@ The following changes have been made while Dockerizing iAstroHub:
 
 Files that previously lived in "modified_codes", as well as config file changes, are now persisted as patches. This way they remain compatible with other minor changes to the same set of files.
 
-The patch files live in a top level "patches" directory, whose structure mirrors the patch file locations in the container image.
+The patch files live in a "patches" directory within the ./build/<tool name> directory. The structure of each "patches" directory mirrors that of the container image, so if you are patching "/home/pi/foo.txt", the patch will live at "./build/<tool name>/home/pi/foo.txt.patch".
 
 Patches are created via `diff -u <old file version> <new file version> > <original filename>.patch`. When patches are applied, the original file is renamed to <original filename>.orig so that it is available for post hoc inspection. If you need to make further changes to these files, make them in the container, and then recreate the patch by running `diff -u <filename> <filename.orig> > <filename>.patch`.
 
-You can then copy your latest patch into this git repository by running: `docker cp <container hash>:<filepath>.patch patches<filepath>.patch`.
+You can then copy your latest patch into this git repository by running: `docker cp <container hash>:<filepath>.patch build/<tool name>/patches/<filepath>.patch`.
 
 ## Status
 

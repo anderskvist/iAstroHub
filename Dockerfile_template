@@ -1,232 +1,73 @@
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 3. System Update
-RUN apt-get -y update
-RUN apt-get -y upgrade
+COPY build/common.sh /build/common.sh
 
-# Download Astrometry data set as early as possible in Docker cache to minimize
-# the chance of it being invalidated.
-RUN mkdir -p /usr/local/astrometry/data/
-WORKDIR /usr/local/astrometry/data/
-RUN apt-get -y install wget
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
-RUN wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
-WORKDIR /
+# 3. System Update
+COPY build/system_update /build/system_update
+RUN /build/system_update/run.sh
 
 # 5. Install tools
-RUN apt-get -y install \
-  aptitude \
-  bc \
-  build-essential \
-  g++ \
-  gcc \
-  make \
-  nano \
-  usbutils \
-  wget
+COPY build/build_tools /build/build_tools
+RUN /build/build_tools/run.sh
 
-# Install dependencies in batches here, so we don't have to reinstall them
-# every time the cache is invalidated. When you're changing dependencies, you
-# may want to test everything by installing them downstream, and move them here
-# when you're done.
-RUN apt-get -y install curl libwww-perl # 10. Pushover Notification
-RUN apt-get -y install espeak libglu1-mesa libgtk2.0-0 libpango1.0-0 xplanet # Skychart
-RUN apt-get -y install ufraw ufraw-batch libgtk2.0-dev # Pentax
-RUN apt-get -y install sudo # Login as root
-RUN apt-get -y install x11vnc xfonts-75dpi xfonts-cyrillic xfonts-scalable xvfb # xvfb and vnc
-RUN apt-get -y install nginx php5-cgi php5-cli php5-common php5-fpm # Webserver
-RUN apt-get -y install build-essential git libusb-1.0-0-dev pkg-config # Dslrdashboard
-RUN apt-get -y install libcairo2-dev libjpeg-dev libnetpbm10-dev libpng12-dev netpbm python-dev python-pip python-pyfits python-numpy zlib1g-dev # Astrometry
-RUN apt-get -y install fxload libftdi-dev libqt4-dev libusb-1.0-0-dev # Lin_guider
-RUN apt-get -y install cmake fxload imagemagick libcfitsio3-dev libglib2.0-0 libglib2.0-dev libgtk2.0-0 libgtk2.0-dev libudev-dev # OpenSkyImager
-RUN apt-get -y install ser2net socat # TCP to Serial
-RUN apt-get -y install libgps-dev dcraw libnova-dev libcfitsio3-dev libusb-1.0-0-dev zlib1g-dev libgsl0-dev build-essential cmake git libjpeg-dev libcurl4-gnutls-dev libboost-regex-dev libraw-dev # INDI Server
-RUN apt-get -y install libgtk-3-0 libgtk-3-dev grace # GoQat
-RUN apt-get -y install dos2unix # QSI
+# 13. Astrometry
+COPY build/astrometry /build/astrometry
+RUN /build/astrometry/run.sh
 
 # 11. Hostname
-RUN echo "iAstroHub" > /etc/hostname
-# 127.0.1.1 was used in the initial README; I believe it should be 127.0.0.1.
-RUN echo "127.0.0.1 iAstroHub" >> /etc/hosts
+COPY build/hostname /build/hostname
+RUN /build/hostname/run.sh
 
 # 12. Skychart
-RUN mkdir /skychart
-# Install on Raspbian/arm
-RUN uname -a | grep arm && cd /skychart && \
-  wget http://sourceforge.net/projects/libpasastro/files/version%201.1/libpasastro_1.1-15_armhf.deb && \
-  dpkg -i libpasastro_1.1-15_armhf.deb && \
-  wget http://sourceforge.net/projects/skychart/files/1-software/version_4.0/skychart_4.0-3575b_armhf.deb && \
-  dpkg -i skychart_4.0-3575b_armhf.deb || \
-  true
-# Install on Debian/x64
-RUN uname -a | grep x86_64 && cd /skychart && \
-  wget http://sourceforge.net/projects/libpasastro/files/version%201.1/libpasastro_1.1-14_amd64.deb && \
-  dpkg -i libpasastro_1.1-14_amd64.deb && \
-  wget http://sourceforge.net/projects/skychart/files/1-software/version_4.0/skychart_4.0-3575b_amd64.deb && \
-  dpkg -i skychart_4.0-3575b_amd64.deb || \
-  true
-# Install data set
-RUN cd /skychart && \
-  wget http://sourceforge.net/projects/skychart/files/2-catalogs/Nebulea/skychart-data-pictures_4.0-3421_all.deb && \
-  dpkg -i skychart-data-pictures_4.0-3421_all.deb
+COPY build/skychart /build/skychart
+RUN /build/skychart/run.sh
 
 # 16. Pentax
-RUN wget https://github.com/asalamon74/pktriggercord/releases/download/v0.84.00/pkTriggerCord-0.84.00.src.tar.gz && \
-  tar xvf pkTriggerCord-0.84.00.src.tar.gz && \
-  cd pktriggercord-0.84.00/ && make && make install
+COPY build/pentax /build/pentax
+RUN /build/pentax/run.sh
 
 # 2. Login as root
-RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+COPY build/sudo /build/sudo
+RUN /build/sudo/run.sh
 
 # 15. gphoto2
-RUN mkdir -p /home/pi && \
-  cd /home/pi && \
-  wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh && \
-  chmod +x ./gphoto2-updater.sh && \
-  ./gphoto2-updater.sh --stable
-
-# Copy patches as late as we can in the Docker cache, as any changes will cause
-# an invalidation.
-COPY patches /patches
+COPY build/gphoto2 /build/gphoto2
+RUN /build/gphoto2/run.sh
 
 # 7. Webserver
 COPY www /home/pi/www
-RUN chmod -R 777 /home/pi/www && \
-  LOCATION=/etc/php5/cgi/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/etc/php5/cli/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/etc/php5/fpm/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/etc/nginx/sites-available/default; patch -b -i /patches/$LOCATION.patch $LOCATION
+COPY build/webserver /build/webserver
+RUN /build/webserver/run.sh
 
 # 14. Dslrdashboard
-RUN git clone https://github.com/hubaiz/DslrDashboardServer.git /home/pi/DslrDashboardServer && \
-  cd /home/pi/DslrDashboardServer && \
-  g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver && \
-  chmod +x ./ddserver && \
-  cp ./ddserver /home/pi/www/
-
-# 13. Astrometry
-RUN pip install pyephem && \
-  cd /home/pi && \
-  wget http://www.astrometry.net/downloads/astrometry.net-0.40.tar.bz2 && \
-  tar xjf astrometry.net-0.40.tar.bz2 && \
-  rm astrometry.net-0.40.tar.bz2 && \
-  LOCATION=/home/pi/astrometry.net-0.40/blind/solve-field.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/astrometry.net-0.40/util/starutil.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  cd /home/pi/astrometry.net-0.40 && make && make install
+COPY build/dslrdashboard /build/dslrdashboard
+RUN /build/dslrdashboard/run.sh
 
 # 18. Lin_guider
-RUN cd /home/pi && wget https://sourceforge.net/projects/cccd/files/firmware/firmware-ccd_1.3_all.deb && dpkg -i firmware-ccd_1.3_all.deb
-# Asic drivers for Raspbian/arm
-RUN uname -a | grep arm && cd /home/pi && \
-  wget https://sourceforge.net/projects/linguider/files/asi_sdk/lg_4.0.0/libasicamera-0.3.0623-armhf.deb && \
-  dpkg -i libasicamera-0.3.0623-armhf.deb && \
-  wget https://sourceforge.net/projects/linguider/files/atik_sdk/lg_3.3.0-4.0.0/atikccdsdk-1.1-v7-armhf.deb && \
-  dpkg -i atikccdsdk-1.1-v7-armhf.deb || \
-  true
-# Asic drivers for Debian/x64
-RUN uname -a | grep x86_64 && cd /home/pi && \
-  wget https://sourceforge.net/projects/linguider/files/asi_sdk/lg_4.0.0/libasicamera-0.3.0623-amd64.deb && \
-  dpkg -i libasicamera-0.3.0623-amd64.deb && \
-  wget https://sourceforge.net/projects/linguider/files/atik_sdk/lg_3.3.0-4.0.0/atikccdsdk-1.1-amd64.deb && \
-  dpkg -i atikccdsdk-1.1-amd64.deb || \
-  true
-RUN cd /home/pi && wget https://sourceforge.net/projects/libnexstar/files/libnexstar-0.15.tar.gz && tar -xvf libnexstar-0.15.tar.gz && \
-  cd /home/pi/libnexstar-0.15/ && ./configure && make && make install && \
-  cd /home/pi && wget https://sourceforge.net/projects/linguider/files/3.3.0/lin_guider-3.3.0.tar.bz2 && tar -xvf lin_guider-3.3.0.tar.bz2 && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/lin_guider.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/rcalibration.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/server.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/include/guider.h; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/include/rcalibration.h; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/include/server.h; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_asi.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_atik.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_qhy5ii.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_qhy6.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/lin_guider_pack/lin_guider/src/video_dev/video_sx.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  cd /home/pi/lin_guider_pack/lin_guider && ./configure && make
-WORKDIR /
+COPY build/lin_guider /build/lin_guider
+RUN /build/lin_guider/run.sh
 
 # 19. OpenSkyImager
-RUN git clone --depth 1 http://github.com/OpenSkyProject/OpenSkyImager.git /home/pi/OpenSkyImager && \
-  LOCATION=/home/pi/OpenSkyImager/gtk/imgPixbuf.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/OpenSkyImager/gtk/imgWFuncs.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/OpenSkyImager/sbig/install_sbig.bash; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  mkdir /home/pi/OpenSkyImager/build && \
-  cd /home/pi/OpenSkyImager/build && cmake -D FORCE_GTK2=on -D FORCE_QHY_ONLY=off .. && make install
+COPY build/openskyimager /build/openskyimager
+RUN /build/openskyimager/run.sh
 
 # 9. TCP to Serial
-RUN echo "3300:raw:0:/dev/ttyUSB0:9600 NONE 1STOPBIT 8DATABITS" >> /etc/ser2net.conf && \
-  echo "3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS" >> /etc/ser2net.conf
+COPY build/ser2net /build/ser2net
+RUN /build/ser2net/run.sh
 
 # 20. QSI
-# FTDI drivers for Raspbian/arm
-RUN uname -a | grep arm && cd /home/pi && wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-arm-v7-hf-1.3.6.tgz && tar xvf libftd2xx-arm-v7-hf-1.3.6.tgz || true
-# FTDI drivers for Debian/x64
-RUN uname -a | grep x86_64 && cd /home/pi && wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz && tar xvf libftd2xx-x86_64-1.3.6.tgz || true
-RUN cd /home/pi/release/build/ && \
-  cp libftd2xx.* /usr/lib && \
-  chmod 755 /usr/lib/libftd2xx.so.1.3.6 && \
-  ln -fs /usr/lib/libftd2xx.so.1.3.6 /usr/lib/libftd2xx.so && \
-  cd /home/pi && \
-  wget http://www.qsimaging.com/downloads/qsiapi-7.2.0.tar.gz && \
-  tar xvf qsiapi-7.2.0.tar.gz && \
-  cd /home/pi/qsiapi-7.2.0/ && \
-  LOCATION=/home/pi/qsiapi-7.2.0/lib/CCDCamera.cpp; dos2unix $LOCATION; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  ./configure --enable-libftd2xx --prefix=/usr./configure --enable-libftd2xx --prefix=/usr && make all && make install && ldconfig /usr/lib && \
-  echo '# 500-series' > /etc/udev/rules.d/99-qsi.rules && \
-  echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb48", MODE="0666"' >> /etc/udev/rules.d/99-qsi.rules && \
-  echo '# 600-series' >> /etc/udev/rules.d/99-qsi.rules && \
-  echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb49", MODE="0666"' >> /etc/udev/rules.d/99-qsi.rules
+COPY build/qsi /build/qsi
+RUN /build/qsi/run.sh
 
 # 21. GoQat
+COPY build/goqat /build/goqat
+RUN /build/goqat/run.sh
 # TODO: Install this after INDI once INDI Server and Client are configured.
-RUN cd /home/pi && wget https://launchpad.net/ubuntu/+archive/primary/+files/goocanvas-2.0_2.0.2.orig.tar.xz && tar xvf goocanvas-2.0_2.0.2.orig.tar.xz && \
-  cd /home/pi/goocanvas-2.0.2 && ./configure && make && make install && ldconfig && \
-  cd /home/pi && wget http://canburytech.net/GoQat/download/goqat-2.1.1.tar.gz && tar xvf goqat-2.1.1.tar.gz && \
-  LOCATION=/home/pi/goqat-2.1.1/src/qsi.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/goqat-2.1.1/src/interface.c; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  cd /home/pi/goqat-2.1.1 && ./configure && make && make install
+
 
 # 24. INDI
-RUN git clone --depth 1 https://github.com/indilib/indi.git /home/pi/indi && \
-  LOCATION=/home/pi/indi/libindi/drivers/agent/agent_imager.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  LOCATION=/home/pi/indi/3rdparty/indi-qsi/qsi_ccd.cpp; patch -b -i /patches/$LOCATION.patch $LOCATION && \
-  mkdir -p /home/pi/indi/build/libindi && \
-  cd /home/pi/indi/build/libindi && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../../libindi && make && make install && \
-  cp /home/pi/indi/3rdparty/libsbig/sbigudrv.h /usr/include/ && \
-  mkdir -p /home/pi/indi/build/3rdparty && \
-  cd /home/pi/indi/build/3rdparty && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../../3rdparty && make && make install && \
-  cd /home/pi/indi/3rdparty/indi-mi && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../../3rdparty && make && make install
-# Atik drivers for Raspbian/arm
-RUN uname -a | grep arm && \
-  wget http://download.cloudmakers.eu/atikccd-1.22-armhf.deb && \
-  dpkg -i atikccd-1.22-armhf.deb && \
-  wget http://download.cloudmakers.eu/atikccdsdk-1.22-armhf.deb && \
-  dpkg -i atikccdsdk-1.22-armhf.deb || \
-  true
-# Atik drivers for Debian/x64
-RUN uname -a | grep x86_64 && \
-  wget http://download.cloudmakers.eu/atikccd-1.22-amd64.deb && \
-  dpkg -i atikccd-1.22-amd64.deb && \
-  wget http://download.cloudmakers.eu/atikccdsdk-1.22-amd64.deb && \
-  dpkg -i atikccdsdk-1.22-amd64.deb || \
-  true
-RUN cd /home/pi/indi/3rdparty/libqhy && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../../3rdparty && make && make install && \
-  cd /home/pi/indi/3rdparty/indi-qhy && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../../3rdparty && make && make install
+COPY build/indi /build/indi
+RUN /build/indi/run.sh
 
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
