@@ -54,7 +54,8 @@ The following changes have been made while Dockerizing iAstroHub:
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
 * Astrometry compiled with updated gcc 4.9 suite rather than 4.4 suite.
-* Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files 
+* Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
+* GoQat upgraded from 2.0.0 to 2.1.1; includes native support for INDI removeDevice.
  
 ## Workflow Changes
 
@@ -228,170 +229,6 @@ sudo depmod -a
 
 
 
-21. GoQat
-
-sudo apt-get install libgtk-3-0 libgtk-3-dev grace
-
-cd /home/pi/
-wget https://launchpad.net/ubuntu/+archive/primary/+files/goocanvas-2.0_2.0.2.orig.tar.xz
-tar xvf goocanvas-2.0_2.0.2.orig.tar.xz
-cd goocanvas-2.0.2/
-./configure
-sudo make
-sudo make install
-sudo ldconfig
-
-
-################## EDIT GOQAT 2.1.0 ##################
-
-nano /home/pi/goqat-2.1.0/src/indi_client.cpp
-************************************
-    virtual void serverConnected ();
-    virtual void serverDisconnected (int exit_code);
-    virtual void newDevice (INDI::BaseDevice *dp);
-    virtual void removeDevice (INDI::BaseDevice *dp);
-    virtual void newProperty (INDI::Property *property);
-    virtual void removeProperty (INDI::Property *property);
-	
-
-************************************	
-void INDIClient::newDevice (INDI::BaseDevice *dp)
-{
-	/* Add a new device */
-	
-    client->setBLOBMode (B_ALSO, dp->getDeviceName(), NULL);
-    indi_new_device (dp->getDeviceName ());
-}
-
-void INDIClient::removeDevice (INDI::BaseDevice *dp)
-{
-	/* Remove a device */
-}
-
-void INDIClient::newProperty (INDI::Property *property)
-{	
-
-
-nano /home/pi/goqat-2.1.0/src/qsi.c
-************************************
-int qsi_get_state (struct ccd_state *state, int AllSettings, ...)
-{
-...
-				default:
-					strcpy (state->status, "Unknown ");
-					break;
-			}
-		} else
-			return TRUE;  //********** Was 'return FALSE'
-...
-		
-get_error:
-	pthread_mutex_unlock (&get_mutex);
-	return TRUE;  //********** Was 'return FALSE'
-}
-
-
-nano /home/pi/goqat-2.1.0/src/interface.c
-************************************
-void on_txtCCDExposure_activate (GtkEditable *editable, gpointer data)
-{
-	/* Start the exposure if the user presses the Return key in the
-	 * Exposure field.
-	 */
-	
-	// gtk_widget_activate (xml_get_widget (xml_app, "btnCCDStart"));
-}
-
-
-************************************
-void set_fits_data (struct cam_img *img, gboolean UseDateobs, 
-                    enum CamType camtype, gboolean QueryHardware)
-{
-...
-
-	if (QueryHardware) {
-	
-		/* Get RA and Dec from telescope controller.  This routine prints a
-		 * warning and sets the values to zero if the link is not open.
-		 */
-/*		
-		telescope_get_RA_Dec (menu.Precess, &img->fits.epoch, 
-						      img->fits.RA, img->fits.Dec, 
-							  &ignore1, &ignore2, &ignore3, &ignore4);
-*/		
-		/* No need to warn if focuser not open/available.  Just set values
-		 * silently to zero.
-		 */
-
-		if (focus_comms->user & PU_FOCUS) {
-			f.cmd = FC_VERSION;
-			focus_comms->focus (&f);
-			if (f.version >= 3.0)
-				f.cmd = FC_CUR_POS_GET | FC_TEMP_GET;
-			else
-				f.cmd = FC_CUR_POS_GET;
-			focus_comms->focus (&f);
-			if (!f.Error) {
-				img->fits.focus_pos = f.cur_pos;
-				if (f.version >= 3.0)
-					img->fits.focus_temp = f.temp;
-			    else
-					img->fits.focus_temp = 0.0;
-			}
-		} else {
-			img->fits.focus_pos = 0;
-			img->fits.focus_temp = 0.0;
-		}
-	} else {
-	//	sprintf (img->fits.RA, "00:00:00");
-	//	sprintf (img->fits.Dec, "+00:00:00");
-		img->fits.focus_pos = 0;
-		img->fits.focus_temp = 0.0;
-	}
-
-}
-
-
-************************************
-void check_focuser_temp (void)
-{
-	/* Query the focuser temperature and display on Focus tab.  Make focus
-	 * adjustments if the user has requested it.
-	 */
-
-	FILE * pFile;
-...
-
-
-		pFile = fopen ("/home/pi/www/FC_CUR_POS.txt","w");
-		fprintf (pFile, "%d\n", f.cur_pos);
-		fclose(pFile);
-		
-		pFile = fopen ("/home/pi/www/FC_TEMP.txt","w");
-		fprintf (pFile, "%.1f\n", f.temp);
-		fclose(pFile);
-		
-	} else
-		L_print ("{r}Error reading focuser temperature\n");
-}
-
-################################################
-
-cd /home/pi/goqat-2.1.0/
-./configure
-sudo make
-sudo make install
-
-
-
-
-
-
-
-
-
-
-
 22. TTS
 
 sudo amixer set PCM -- 400
@@ -550,7 +387,7 @@ exit 0
 24.1 INDI server (Compiled from source codes)
 REFERENCE: https://github.com/indilib/indi
 
-sudo apt-get install libgps-dev dcraw libnova-dev libcfitsio3-dev libusb-1.0-0-dev zlib1g-dev libgsl0-dev build-essential cmake git libjpeg-dev libcurl4-gnutls-dev libboost-regex-dev
+sudo apt-get -y install libgps-dev dcraw libnova-dev libcfitsio3-dev libusb-1.0-0-dev zlib1g-dev libgsl0-dev build-essential cmake git libjpeg-dev libcurl4-gnutls-dev libboost-regex-dev
 
 cd /home/pi/
 git clone https://github.com/indilib/indi.git

@@ -1,0 +1,20 @@
+--- qsi.c	2016-11-03 22:01:38.000000000 +0000
++++ qsi.c.new	2017-04-14 23:08:46.571579255 +0000
+@@ -304,7 +304,7 @@
+ 					break;
+ 			}
+ 		} else
+-			return FALSE;
++			return TRUE;
+ 		
+ 		if (!QSI_STATUS (QSICamera_get_CoolerOn (&state->CoolState)))
+ 			goto get_error;
+@@ -376,7 +376,7 @@
+ 	
+ get_error:
+ 	pthread_mutex_unlock (&get_mutex);
+-	return FALSE;
++	return TRUE;
+ }
+ 
+ int qsi_set_imagearraysize (long x, long y, long x_wid, long y_wid, long x_bin, 

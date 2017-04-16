@@ -1,0 +1,51 @@
+--- interface.c	2016-12-05 17:47:19.000000000 +0000
++++ interface.c.new	2017-04-14 23:15:48.729620599 +0000
+@@ -3411,11 +3411,6 @@
+ 
+ void on_txtCCDExposure_activate (GtkEditable *editable, gpointer data)
+ {
+-	/* Start the exposure if the user presses the Return key in the
+-	 * Exposure field.
+-	 */
+-	
+-	gtk_widget_activate (xml_get_widget (xml_app, "btnCCDStart"));
+ }
+ 
+ void on_cmbExpType_changed (GtkWidget *widget, gpointer data)
+@@ -10464,14 +10459,6 @@
+ 	
+ 	if (QueryHardware) {
+ 		
+-		/* Get RA and Dec from telescope controller.  This routine prints a
+-		 * warning and sets the values to zero if the link is not open.
+-		 */
+-		
+-		telescope_get_RA_Dec (menu.Precess, &img->fits.epoch, 
+-						      img->fits.RA, img->fits.Dec, 
+-							  &ignore1, &ignore2, &ignore3, &ignore4);
+-		
+ 		/* No need to warn if focuser not open/available.  Just set values
+ 		 * silently to zero.
+ 		 */
+@@ -11016,6 +11003,7 @@
+ 	 * adjustments if the user has requested it.
+ 	 */
+ 	
++	FILE *pFile;
+ 	struct focus f;
+ 	gint pos, steps;
+ 	gdouble deltaT, coeff;
+@@ -11045,6 +11033,13 @@
+ 				}
+ 			}
+ 		}
++		pFile = fopen ("/home/pi/www/FC_CUR_POS.txt","w");
++		fprintf (pFile, "%d\n", f.cur_pos);
++		fclose(pFile);
++
++		pFile = fopen ("/home/pi/www/FC_TEMP.txt","w");
++		fprintf (pFile, "%.1f\n", f.temp);
++		fclose(pFile);
+ 	} else
+ 		L_print ("{r}Error reading focuser temperature\n");
+ }
