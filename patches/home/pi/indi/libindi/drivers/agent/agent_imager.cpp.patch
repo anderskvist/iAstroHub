@@ -1,0 +1,11 @@
+--- agent_imager.cpp	2017-04-15 00:01:40.000000000 +0000
++++ agent_imager.cpp.new	2017-04-15 00:03:29.288329931 +0000
+@@ -213,7 +213,7 @@
+   IUFillSwitch(&BatchS[1], "ABORT", "Abort batch", ISS_OFF);
+   IUFillSwitchVector(&BatchSP, BatchS, 2, DEVICE_NAME, "BATCH", "Batch control", MAIN_CONTROL_TAB, IP_RW, ISR_NOFMANY, 60, IPS_IDLE);
+ 
+-  IUFillText(&ImageNameT[0], "IMAGE_FOLDER", "Image folder", "/tmp");
++  IUFillText(&ImageNameT[0], "IMAGE_FOLDER", "Image folder", "/home/pi/www/images");
+   IUFillText(&ImageNameT[1], "IMAGE_PREFIX", "Image prefix", "IMG");
+   IUFillTextVector(&ImageNameTP, ImageNameT, 2, DEVICE_NAME, "IMAGE_NAME", "Image name", OPTIONS_TAB, IP_RW, 60, IPS_IDLE);
+ 
