@@ -1,0 +1,14 @@
+--- CCDCamera.cpp	2017-04-14 19:58:48.554166072 +0000
++++ CCDCamera.cpp.new	2017-04-14 20:00:39.522221703 +0000
+@@ -3238,6 +3238,11 @@
+ 	if (!m_bIsConnected)
+ 		return Error ( "Not Connected", IID_ICamera, MAKE_HRESULT(1,FACILITY_ITF, QSI_NOTCONNECTED) );
+ 
++	// ADDED TO FIX BUG
++	if (!m_AdvEnabledOptions.AntiBlooming)
++		return Error ( "Option not available on this model", IID_ICamera, MAKE_HRESULT(1,FACILITY_ITF, QSI_NOTSUPPORTED) );
++	// END HERE
++
+ 	QSI_Registry Registry;
+ 
+ 	// Attempt to get the advanced settings from registry and go to camera default on any setting that can't be retrieved

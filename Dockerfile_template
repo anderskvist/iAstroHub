@@ -38,10 +38,21 @@ RUN apt-get -y install \
   usbutils \
   wget
 
-# 10. Pushover Notification
-RUN apt-get -y install \
-  curl \
-  libwww-perl
+# Install dependencies in batches here, so we don't have to reinstall them
+# every time the cache is invalidated. When you're changing dependencies, you
+# may want to test everything by installing them downstream, and move them here
+# when you're done.
+RUN apt-get -y install curl libwww-perl # 10. Pushover Notification
+RUN apt-get -y install espeak libglu1-mesa libgtk2.0-0 libpango1.0-0 xplanet # Skychart
+RUN apt-get -y install ufraw ufraw-batch libgtk2.0-dev # Pentax
+RUN apt-get -y install sudo # Login as root
+RUN apt-get -y install x11vnc xfonts-75dpi xfonts-cyrillic xfonts-scalable xvfb # xvfb and vnc
+RUN apt-get -y install nginx php5-cgi php5-cli php5-common php5-fpm # Webserver
+RUN apt-get -y install build-essential git libusb-1.0-0-dev pkg-config # Dslrdashboard
+RUN apt-get -y install libcairo2-dev libjpeg-dev libnetpbm10-dev libpng12-dev netpbm python-dev python-pip python-pyfits python-numpy zlib1g-dev # Astrometry
+RUN apt-get -y install fxload libftdi-dev libqt4-dev libusb-1.0-0-dev # Lin_guider
+RUN apt-get -y install cmake fxload imagemagick libcfitsio3-dev libglib2.0-0 libglib2.0-dev libgtk2.0-0 libgtk2.0-dev libudev-dev # OpenSkyImager
+RUN apt-get -y install ser2net socat # TCP to Serial
 
 # 11. Hostname
 RUN echo "iAstroHub" > /etc/hostname
@@ -49,12 +60,6 @@ RUN echo "iAstroHub" > /etc/hostname
 RUN echo "127.0.0.1 iAstroHub" >> /etc/hosts
 
 # 12. Skychart
-RUN apt-get -y install \
-  espeak \
-  libglu1-mesa \
-  libgtk2.0-0 \
-  libpango1.0-0 \
-  xplanet
 RUN mkdir /skychart
 WORKDIR /skychart
 # Install on Raspbian/arm
@@ -67,15 +72,12 @@ RUN uname -a | grep x86_64 && wget http://sourceforge.net/projects/libpasastro/f
 RUN uname -a | grep x86_64 && dpkg -i libpasastro_1.1-14_amd64.deb || true
 RUN uname -a | grep x86_64 && wget http://sourceforge.net/projects/skychart/files/1-software/version_4.0/skychart_4.0-3575b_amd64.deb || true
 RUN uname -a | grep x86_64 && dpkg -i skychart_4.0-3575b_amd64.deb || true
-# Correct dependencies after manual package installation.
-RUN apt-get -fy install
 # Install data set
 RUN wget http://sourceforge.net/projects/skychart/files/2-catalogs/Nebulea/skychart-data-pictures_4.0-3421_all.deb
 RUN dpkg -i skychart-data-pictures_4.0-3421_all.deb
 WORKDIR /
 
 # 16. Pentax
-RUN apt-get -y install ufraw ufraw-batch libgtk2.0-dev
 RUN wget https://github.com/asalamon74/pktriggercord/releases/download/v0.84.00/pkTriggerCord-0.84.00.src.tar.gz
 RUN tar xvf pkTriggerCord-0.84.00.src.tar.gz
 WORKDIR pktriggercord-0.84.00/
@@ -84,16 +86,7 @@ RUN make install
 WORKDIR /
 
 # 2. Login as root
-RUN apt-get -y install sudo
 RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
-
-# 8. xvfb and vnc
-RUN apt-get -y install \
-  x11vnc \
-  xfonts-75dpi \
-  xfonts-cyrillic \
-  xfonts-scalable \
-  xvfb
 
 # 15. gphoto2
 WORKDIR /home/pi
@@ -109,23 +102,12 @@ COPY patches /patches
 # 7. Webserver
 COPY www /home/pi/www
 RUN chmod -R 777 /home/pi/www
-RUN apt-get -y install \
-  nginx \
-  php5-cgi \
-  php5-cli \
-  php5-common \
-  php5-fpm
 RUN LOCATION=/etc/php5/cgi/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/cli/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/php5/fpm/php.ini; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/etc/nginx/sites-available/default; patch -b -i /patches/$LOCATION.patch $LOCATION
 
 # 14. Dslrdashboard
-RUN apt-get -y install \
-  build-essential \
-  git \
-  libusb-1.0-0-dev \
-  pkg-config
 RUN git clone https://github.com/hubaiz/DslrDashboardServer.git /home/pi/DslrDashboardServer
 WORKDIR /home/pi/DslrDashboardServer
 RUN g++ -Wall src/main.cpp src/communicator.cpp `pkg-config --libs --cflags libusb-1.0` -lpthread -lrt -lstdc++ -o ddserver
@@ -134,17 +116,6 @@ RUN cp ./ddserver /home/pi/www/
 WORKDIR /
 
 # 13. Astrometry
-RUN apt-get -y install \
-  libcairo2-dev \
-  libjpeg-dev \
-  libnetpbm10-dev \
-  libpng12-dev \
-  netpbm \
-  python-dev \
-  python-pip \
-  python-pyfits \
-  python-numpy \
-  zlib1g-dev
 RUN pip install pyephem
 WORKDIR /home/pi
 RUN wget http://www.astrometry.net/downloads/astrometry.net-0.40.tar.bz2
@@ -158,11 +129,6 @@ RUN make install
 WORKDIR /
 
 # 18. Lin_guider
-RUN apt-get -y install \
-  fxload \
-  libftdi-dev \
-  libqt4-dev \
-  libusb-1.0-0-dev
 WORKDIR /home/pi
 RUN wget https://sourceforge.net/projects/cccd/files/firmware/firmware-ccd_1.3_all.deb
 RUN dpkg -i firmware-ccd_1.3_all.deb
@@ -202,16 +168,6 @@ RUN make
 WORKDIR /
 
 # 19. OpenSkyImager
-RUN apt-get -y install \
-  cmake \
-  fxload \
-  imagemagick \
-  libcfitsio3-dev \
-  libglib2.0-0 \
-  libglib2.0-dev\
-  libgtk2.0-0 \
-  libgtk2.0-dev \
-  libudev-dev
 RUN git clone --depth 1 http://github.com/OpenSkyProject/OpenSkyImager.git /home/pi/OpenSkyImager
 RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgPixbuf.c; patch -b -i /patches/$LOCATION.patch $LOCATION
 RUN LOCATION=/home/pi/OpenSkyImager/gtk/imgWFuncs.c; patch -b -i /patches/$LOCATION.patch $LOCATION
@@ -223,9 +179,37 @@ RUN make install
 WORKDIR /
 
 # 9. TCP to Serial
-RUN apt-get -y install ser2net socat
 RUN echo "3300:raw:0:/dev/ttyUSB0:9600 NONE 1STOPBIT 8DATABITS" >> /etc/ser2net.conf
 RUN echo "3301:raw:0:/dev/ttyUSB0:19200 EVEN 1STOPBIT 8DATABITS" >> /etc/ser2net.conf
+
+# 20. QSI
+WORKDIR /home/pi
+# FTDI drivers for Raspbian/arm
+RUN uname -a | grep arm && wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-arm-v7-hf-1.3.6.tgz || true
+RUN uname -a | grep arm && tar xvf libftd2xx-arm-v7-hf-1.3.6.tgz || true
+# FTDI drivers for Debian/x64
+RUN uname -a | grep x86_64 && wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz || true
+RUN uname -a | grep x86_64 && tar xvf libftd2xx-x86_64-1.3.6.tgz || true
+WORKDIR /home/pi/release/build/
+RUN cp libftd2xx.* /usr/lib
+RUN chmod 755 /usr/lib/libftd2xx.so.1.3.6
+RUN ln -fs /usr/lib/libftd2xx.so.1.3.6 /usr/lib/libftd2xx.so
+WORKDIR /home/pi
+RUN wget http://www.qsimaging.com/downloads/qsiapi-7.2.0.tar.gz
+RUN tar xvf qsiapi-7.2.0.tar.gz
+WORKDIR /home/pi/qsiapi-7.2.0/
+RUN apt-get -y install dos2unix
+RUN LOCATION=/home/pi/qsiapi-7.2.0/lib/CCDCamera.cpp; dos2unix $LOCATION; patch -b -i /patches/$LOCATION.patch $LOCATION
+RUN ./configure --enable-libftd2xx --prefix=/usr./configure --enable-libftd2xx --prefix=/usr
+RUN make all
+RUN make install
+WORKDIR /usr/lib
+RUN ldconfig /usr/lib
+RUN echo '# 500-series' > /etc/udev/rules.d/99-qsi.rules
+RUN echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb48", MODE="0666"' >> /etc/udev/rules.d/99-qsi.rules
+RUN echo '# 600-series' >> /etc/udev/rules.d/99-qsi.rules
+RUN echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb49", MODE="0666"' >> /etc/udev/rules.d/99-qsi.rules
+WORKDIR /
 
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh
