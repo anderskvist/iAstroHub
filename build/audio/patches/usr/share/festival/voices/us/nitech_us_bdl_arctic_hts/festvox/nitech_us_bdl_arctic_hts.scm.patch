@@ -1,0 +1,22 @@
+--- nitech_us_bdl_arctic_hts.scm	2007-03-19 11:09:30.000000000 +0000
++++ nitech_us_bdl_arctic_hts.scm.new	2017-04-17 23:45:40.195916185 +0000
+@@ -68,8 +68,8 @@
+ (set! hts_feats_list
+       (load (path-append hts_data_dir "feat.list") t))
+ 
+-(require 'hts)
+-(require_module 'hts_engine)
++(require 'hts21compat)
++(require_module 'hts21_engine)
+ 
+ ;;; Voice specific parameter are defined in each of the following
+ ;;; files
+@@ -162,7 +162,7 @@
+   ;; Waveform synthesis model: hts
+   (set! hts_engine_params nitech_us_bdl_arctic_hts::hts_engine_params)
+   (set! hts_feats_list nitech_us_bdl_arctic_hts::hts_feats_list)
+-  (Parameter.set 'Synth_Method 'HTS)
++  (Parameter.set 'Synth_Method 'HTS21)
+ 
+   ;; This is where you can modify power (and sampling rate) if desired
+   (set! after_synth_hooks nil)

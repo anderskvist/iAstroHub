@@ -75,6 +75,10 @@ RUN /build/userland/run.sh
 COPY build/cpu_and_temp /build/cpu_and_temp
 RUN /build/cpu_and_temp/run.sh
 
+# 22. TTS
+COPY build/audio /build/audio
+RUN /build/audio/run.sh
+
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &" >> /start.sh && \

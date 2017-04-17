@@ -149,48 +149,6 @@ sudo depmod -a
 
 
 
-22. TTS
-
-sudo amixer set PCM -- 400
-
-
-22.1 Install Festival 
-
-sudo apt-get install festival
-
-echo  "good morning"| festival --tts
-
-echo  "good morning" > speak
-festival --tts speak
-
-
-22.2 Voice file
-
-cd /home/pi/
-mkdir hts_tmp
-cd hts_tmp/
-wget -c http://hts.sp.nitech.ac.jp/archives/2.1/festvox_nitech_us_bdl_arctic_hts-2.1.tar.bz2
-tar xvf festvox_nitech_us_bdl_arctic_hts-2.1.tar.bz2
-
-sudo mkdir -p /usr/share/festival/voices/us
-sudo mv lib/voices/us/* /usr/share/festival/voices/us/
-sudo mv lib/hts.scm /usr/share/festival/hts.scm
-
-nano /usr/share/festival/voices/us/nitech_us_bdl_arctic_hts/festvox/nitech_us_bdl_arctic_hts.scm
-*******************************************
-(require 'hts)
-(require_module 'hts_engine)
-change to
-(require 'hts21compat)
-(require_module 'hts21_engine)
-*******************************************
-(Parameter.set 'Synth_Method 'HTS)
-change to
-(Parameter.set 'Synth_Method 'HTS21)
-*******************************************
-
-
-
 23. nano /etc/rc.local
 *******************************************************************************
 #!/bin/sh -e
