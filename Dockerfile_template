@@ -59,18 +59,17 @@ RUN /build/ser2net/run.sh
 COPY build/qsi /build/qsi
 RUN /build/qsi/run.sh
 
-# 21. GoQat
-COPY build/goqat /build/goqat
-RUN /build/goqat/run.sh
-# TODO: Install this after INDI once INDI Server and Client are configured.
-
-
 # 24. INDI
 COPY build/indi /build/indi
 RUN /build/indi/run.sh
 
+# 21. GoQat
+COPY build/goqat /build/goqat
+RUN /build/goqat/run.sh
+
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
-  echo "service ser2net start" >> /start.sh && \
+  echo "python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &" >> /start.sh && \
+  echo "/home/pi/indi/pyindi-ws.sh &" >> /start.sh && \
   chmod +x /start.sh
 CMD ["/start.sh"]

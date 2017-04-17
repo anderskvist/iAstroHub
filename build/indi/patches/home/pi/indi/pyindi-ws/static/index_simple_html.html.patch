@@ -1,0 +1,19 @@
+--- index_simple_html.html	2017-04-17 11:25:31.512339079 +0000
++++ index_simple_html.html.new	2017-04-17 11:38:15.438567061 +0000
+@@ -13,14 +13,14 @@
+ 	$(document).ready(startws('{scheme!s}','{host!s}',{port!s}));
+       </script>
+     </head>
+-    <body>
++    <body bgcolor="#000000" TEXT="#FF0000" LINK="#FF0000" VLINK="#FF0000">
+       
+       <div id="logs" class="logs">
+ 	<div id="logsheader" class="divheader">
+ 	  Logs
+ 	</div>
+ 	<div id="logscontent" class="divcontent">
+-	  <textarea id='message' rows='10' style="width:100%"></textarea>
++	  <textarea id='message' rows='10' style="width:100%; background-color:#000000; color:#FF0000"></textarea>
+ 	</div>
+ 	<div id="logsfilter" class="divfooter">
+ 	</div>

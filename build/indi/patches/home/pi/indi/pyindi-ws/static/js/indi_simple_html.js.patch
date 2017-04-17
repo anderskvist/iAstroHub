@@ -1,0 +1,21 @@
+--- indi_simple_html.js	2017-04-17 11:44:02.912692680 +0000
++++ indi_simple_html.js.new	2017-04-17 11:51:09.162877714 +0000
+@@ -936,8 +936,8 @@
+ 	    context: this.beforeelt
+ 	});
+ 	before.parent().on('click', '#connect', {context: this}, function(evt) { 
+-	    var server = $('#server').val();
+-	    var port =  $('#port').val();
++	    var server = "localhost";
++	    var port = 7624; 
+ 	    console.log("Connect server "+ server +':'+ port + '\n');
+ 	    var serverkey = evt.data.context.createserver(server, port);
+ 	    $('#message').val($('#message').val() + 'Connecting ' +serverkey+ '\n'); 
+@@ -974,6 +974,7 @@
+ 	    if (jsonmsg.type == 'setKey') {
+ 		this.key = jsonmsg.data;
+ 		result = 'MANAGER: Setting key to ' + this.key;
++		$('#connect').trigger("click");
+ 	    } else {
+ 		var indiserver = this.serverlist[jsonmsg.serverkey];
+ 		if (indiserver !== undefined) {

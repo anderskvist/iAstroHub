@@ -1,0 +1,15 @@
+--- indi_simple_html.html	2017-04-17 11:48:01.047878946 +0000
++++ indi_simple_html.html.new	2017-04-17 11:49:00.097266999 +0000
+@@ -9,12 +9,7 @@
+       <div id='serverconnections' class='serverconnections'>
+ 	<div id='serverconnectionsheader' class='divheader'>
+ 	  <!--<form action='#' id='serverform' method='get'>-->
+-	  <fieldset>
+-	    <legend>Add Indi server</legend>
+-	    <label for='server'>Server: </label><input type='text' id='server' size='15' list='knownindiservers'/>
+-	    <label for='port'>Port: </label><input type='number' id='port' max='65535' size='5' list='knownindiports'/>
+ 	    <input id='connect' type='button' value='Connect' />
+-	  </fieldset>
+ 	  <!--</form>-->
+ 	</div>
+ 	<div id='serverconnectionslist' class='divcontent'>

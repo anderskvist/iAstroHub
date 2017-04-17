@@ -55,6 +55,7 @@ The following changes have been made while Dockerizing iAstroHub:
 * Skychart upgraded to version 4.
 * Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
 * GoQat upgraded from 2.0.0 to 2.1.1; includes native support for INDI removeDevice.
+* indi_simple_html_cherrypy_server binds to 0.0.0.0 instead of 10.0.0.1, so it is not dependent on a specific network-available IP address
  
 ## Workflow Changes
 
@@ -379,130 +380,6 @@ fi
 
 exit 0
 
-
-
-24.2 INDI client (web interface)
-
-24.2.1 INDI web manager
-
-sudo apt-get install python-dev python-pip
-sudo pip install psutil
-sudo pip install bottle
-
-cd /home/pi/indi/
-git clone https://github.com/knro/indiwebmanager.git
-
-
--------------------------- CHANGE TO DARK THEME ------------------------------
-cd /home/pi/indi/indiwebmanager/servermanager/views/css/
-curl -O http://bootswatch.com/cyborg/bootstrap.css
-curl -O http://bootswatch.com/cyborg/bootstrap.min.css
-
-nano /home/pi/indi/indiwebmanager/servermanager/views/css/bootstrap.css
-nano /home/pi/indi/indiwebmanager/servermanager/views/css/bootstrap.min.css
-********************************************
-Comment the first line to prevent accessing internet
-********************************************
-
-nano /home/pi/indi/indiwebmanager/servermanager/views/form.tpl
-********************************************
-<!--  <link rel="stylesheet" type="text/css" href="/static/css/schoolhouse.css">  -->
-********************************************
-------------------------------------------------------------------------------
-
-
-python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &
-
-
-24.2.2 pyindi-ws
-
-# install swig-indi-python
-apt-get install swig2.0 subversion
-cd /home/pi/indi/
-svn co -r 36 svn://svn.code.sf.net/p/pyindi-client/code/trunk/swig-indi/swig-indi-python/
-mkdir libindipython
-cd libindipython
-cmake ../swig-indi-python
-make
-sudo make install
-
-# install cherrypy version 3
-sudo apt-get install python-cherrypy3
-
-# install ws4py
-sudo mkdir /home/pi/indi/ws4py
-chown root.root /home/pi/indi/ws4py
-cd /home/pi/indi/ws4py
-git clone https://github.com/Lawouach/WebSocket-for-Python.git
-cd /home/pi/indi/ws4py/WebSocket-for-Python
-python setup.py install
-
-# install and run the websocket server
-cd /home/pi/indi/
-svn co svn://svn.code.sf.net/p/pyindi-client/code/trunk/pyindi-ws
-cd /home/pi/indi/pyindi-ws/
-python indi_simple_html_cherrypy_server.py --host 10.0.0.1 --port 8888
-
-
-nano /home/pi/indi/pyindi-ws/static/index_simple_html.html
-*********************************************************************
-<html>
-<title>INDI Control Panel</title>
-    <head>
-
-<body bgcolor="#000000" TEXT="#FF0000" LINK="#FF0000" VLINK="#FF0000">
-
-<textarea id='message' rows='10' style="width:100%; background-color:#000000; color:#FF0000"></textarea>
-*********************************************************************
-
-
-nano /home/pi/indi/pyindi-ws/static/indi_simple_html.html
-*********************************************************************
-          <!--<form action='#' id='serverform' method='get'>-->
-<!--      <fieldset> -->
-        <!--    <legend></legend>
-            <label for='server'>Server: </label><input type='text' id='server' size='15' list='knownindiservers'/>
-            <label for='port'>Port: </label><input type='number' id='port' max='65535' size='5' list='knownindiports'/> -->
-            <input style="visibility:hidden;" id='connect' type='button' value='Connect' />
-<!--      </fieldset> -->
-          <!--</form>-->
-*********************************************************************
-
-
-nano /home/pi/indi/pyindi-ws/static/js/indi_simple_html.js
-*********************************************************************
-	before.parent().on('click', '#connect', {context: this}, function(evt) { 
-	    var server = "localhost";
-	    var port =  "7624";
-*********************************************************************
-
-
-nano /home/pi/indi/pyindi-ws/static/js/indi_simple_html.js
-*********************************************************************
-            if (jsonmsg.type == 'setKey') {
-                this.key = jsonmsg.data;
-                result = 'MANAGER: Setting key to ' + this.key;
-
-                $('#connect').trigger("click");  // ADDED
-*********************************************************************
-
-
-nano /home/pi/indi/pyindi-ws.sh
-*********************************************************************
-while true
-do
-if ! pgrep -f "indi_simple_html_cherrypy_server" > /dev/null
-then
-    echo "************ Restarting ************"
-	cd /home/pi/indi/pyindi-ws/
-	python indi_simple_html_cherrypy_server.py --host 10.0.0.1 --port 8888 &
-fi
-sleep 4
-done
-*********************************************************************
-
-
-sh /home/pi/indi/pyindi-ws.sh &
 
 
 
