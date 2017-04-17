@@ -56,6 +56,10 @@ The following changes have been made while Dockerizing iAstroHub:
 * Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
 * GoQat upgraded from 2.0.0 to 2.1.1; includes native support for INDI removeDevice.
 * indi_simple_html_cherrypy_server binds to 0.0.0.0 instead of 10.0.0.1, so it is not dependent on a specific network-available IP address
+
+### Docker Run Requirements
+
+* Be sure to run `docker run` with the `--device=/dev/vchiq` flag for `vcgencmd` operations.
  
 ## Workflow Changes
 
