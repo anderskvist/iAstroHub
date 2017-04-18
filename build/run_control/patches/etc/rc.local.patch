@@ -1,0 +1,86 @@
+--- rc.local	2017-03-20 23:28:38.000000000 +0000
++++ rc.local.new	2017-04-18 00:16:26.555900050 +0000
+@@ -11,4 +11,83 @@
+ #
+ # By default this script does nothing.
+ 
++echo "0 " > /home/pi/www/hist_L.txt
++echo "65535 " > /home/pi/www/hist_U.txt
++echo " " > /home/pi/www/image.txt
++echo " " > /home/pi/www/photo.txt
++
++file="/home/pi/www/status_app"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_app
++fi
++
++file="/home/pi/www/status_connect"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_connect
++fi
++
++file="/home/pi/www/status_skychart"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_skychart
++fi
++
++file="/home/pi/www/status_guiding"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_guiding
++fi
++
++file="/home/pi/www/status_capture"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_capture
++fi
++
++file="/home/pi/www/status_ccd"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_ccd
++fi
++
++file="/home/pi/www/status_focus"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_focus
++fi
++
++file="/home/pi/www/status_dslr"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_dslr
++fi
++
++file="/home/pi/www/status_loading"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_loading
++fi
++
++file="/home/pi/www/status_processing"
++if [ -f "$file" ]; then
++  rm /home/pi/www/status_processing
++fi
++
++file="/home/pi/www/prepare_ccd"
++if [ -f "$file" ]; then
++  rm /home/pi/www/prepare_ccd
++fi
++
++/home/pi/www/./sound > /dev/null 2>&1 &
++
++/home/pi/www/./monitor_camera > /dev/null 2>&1 &
++
++/home/pi/www/./monitor_pty > /dev/null 2>&1 &
++
++perl /home/pi/www/event_monitor4.pl &
++
++Xvfb :1 -screen 0 800x600x16 -ac &
++Xvfb :2 -screen 0 800x600x16 -ac &
++Xvfb :3 -screen 0 960x720x16 -ac &
++
++# Pushover notification
++file1="/home/pi/www/notify_imaging"
++file2="/home/pi/www/notify_guiding"
++if [ -f "$file1" ] || [ -f "$file2" ]; then
++  perl /home/pi/www/notify_IP.pl
++fi
++
+ exit 0

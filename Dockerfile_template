@@ -79,6 +79,10 @@ RUN /build/cpu_and_temp/run.sh
 COPY build/audio /build/audio
 RUN /build/audio/run.sh
 
+# 23. nano /etc/rc.local
+COPY build/run_control /build/run_control
+RUN /build/run_control/run.sh
+
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &" >> /start.sh && \
