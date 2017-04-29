@@ -90,25 +90,6 @@ sudo depmod -a
 
 
 
-25. noVNC
-
-cd /home/pi/www/
-git clone https://github.com/kanaka/noVNC.git
-
-Xvfb :1 -screen 0 800x600x16 -ac &
-x11vnc -rfbport 5566 -forever -display :1 &
-*******************************************
-DISPLAY=:1 skychart --unique &
-**************** OR ***********************
-DISPLAY=:1 /home/pi/lin_guider_pack/lin_guider/./lin_guider -geometry 800x600+0+0 &
-*******************************************
-
-/home/pi/www/noVNC/utils/./launch.sh --vnc localhost:5566 --listen 5666 &
-
-http://192.168.1.18/noVNC/vnc.html?autoconnect=true&host=192.168.1.18&port=5666
-
-
-
 26. Kernel modules
 
 apt-get install ncurses-dev

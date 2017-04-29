@@ -87,5 +87,8 @@ RUN /build/run_control/run.sh
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &" >> /start.sh && \
   echo "/home/pi/indi/pyindi-ws.sh &" >> /start.sh && \
+  echo "Xvfb :1 -screen 0 800x600x16 -ac &" >> /start.sh && \
+  echo "x11vnc -rfbport 5566 -forever -display :1 &" >> /start.sh && \
+  echo "/home/pi/www/noVNC/utils/./launch.sh --vnc localhost:5566 --listen 5666 &" >> /start.sh && \
   chmod +x /start.sh
 CMD ["/start.sh"]
