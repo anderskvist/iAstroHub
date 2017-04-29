@@ -85,23 +85,6 @@ You can then copy your latest patch into this git repository by running: `docker
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
 
 ```
-A2. libftdi for Flip-Flat and other devices
-REFERENCE: http://www.intra2net.com/en/developer/libftdi/index.php
-
-sudo apt-get install cmake
-wget http://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.1.tar.bz2
-tar xvf libftdi1-1.1.tar.bz2
-cd libftdi1-1.1
-mkdir build
-cd build
-cmake  -DCMAKE_INSTALL_PREFIX="/usr" ../
-make
-sudo make install
-
-gcc open.c -o open -lftdi
-
-
-
 A3. Preparation
 
 1) delete images in /home/pi/www/images/ and /home/pi/www/tmp_images/ 
