@@ -57,6 +57,7 @@ The following changes have been made while Dockerizing iAstroHub:
 * GoQat upgraded from 2.0.0 to 2.1.1; includes native support for INDI removeDevice.
 * indi_simple_html_cherrypy_server binds to 0.0.0.0 instead of 10.0.0.1, so it is not dependent on a specific network-available IP address
 * max_usb_current no longer set; has no effect on Raspberry Pi 3, which provides 1.2A by default. See: https://www.raspberrypi.org/forums/viewtopic.php?p=930695#p930695
+* User no longer expected to change password or grant root login access; those are responsibilities of a host, not a docker image.
 
 ### Docker Run Requirements
 
@@ -81,22 +82,6 @@ Below is everything in the original README that has not yet been ported to Docke
 ```
 
 1. install Raspbian (2016-05-27-raspbian-jessie-lite)
-
-Log-in via SSH or console
-************************
-user: pi
-password: raspberry
-
-sudo passwd
-password: raspberry
-
-
-sudo nano /etc/ssh/sshd_config
-****************************************
-#PermitRootLogin without-password
-#StrictModes yes
-PermitRootLogin yes
-
 
 sudo raspi-config
 ************************
