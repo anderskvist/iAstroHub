@@ -19,7 +19,8 @@ Remaining work to be done towards this ends is:
 
 ## Running the container
 
-* For full functionality, you must run the container with the `--cap-add SYS_RAWIO` option, or alternatively, with the --privileged flag. You can test the SYS_RAWIO capability by running `/usr/local/bin/pktriggercord-cli -v`.
+* You must run the container with the `--cap-add=ALL` option and with the `--privileged` flag.
+* You must mount kernel modules via `-v /lib/modules:/lib/modules:ro`
 
 ### Manual Steps
 
@@ -51,6 +52,7 @@ The following steps are not yet automated, and so must be run by hand on the fin
 
 The following changes have been made while Dockerizing iAstroHub:
 
+* The FTDI module is copied to /home/pi, but ftdi_load.php and ftdi_unload.php will error if the kernel versions do not match up. My advice is to ensure FTDI is stable and always keep it loaded at the host level.
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
 * Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
@@ -82,13 +84,6 @@ You can then copy your latest patch into this git repository by running: `docker
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
 
 ```
-
-17. FTDI modules
-
-mv /lib/modules/4.4.13-v7+/kernel/drivers/usb/serial/ftdi_sio.ko /home/pi/.
-sudo depmod -a
-
-
 
 26. Kernel modules
 
