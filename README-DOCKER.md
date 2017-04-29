@@ -53,6 +53,7 @@ The following steps are not yet automated, and so must be run by hand on the fin
 The following changes have been made while Dockerizing iAstroHub:
 
 * The FTDI module is copied to /home/pi, but ftdi_load.php and ftdi_unload.php will error if the kernel versions do not match up. My advice is to ensure FTDI is stable and always keep it loaded at the host level.
+* fliusb kernel module is not built in the container. If needed, this should live on the host.
 * /etc/hosts IP address for iAstroHub host is 127.0.0.1, instead of 127.0.1.1.
 * Skychart upgraded to version 4.
 * Used an x64 compatible fix for chipset detection in sbig module for OpenSkyImager. It is the same one used in this pull request: https://github.com/OpenSkyProject/OpenSkyImager/pull/16/files
@@ -84,33 +85,6 @@ You can then copy your latest patch into this git repository by running: `docker
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
 
 ```
-
-26. Kernel modules
-
-apt-get install ncurses-dev
-sudo wget https://raw.githubusercontent.com/notro/rpi-source/master/rpi-source -O /usr/bin/rpi-source && sudo chmod +x /usr/bin/rpi-source && /usr/bin/rpi-source -q --tag-update
-
-sudo modprobe configs
-rpi-source
-
-********* To compile fliusb.ko **************
-cd /home/pi/indi/3rdparty/fliusb/
-make
-sudo cp /home/pi/indi/3rdparty/fliusb/fliusb.ko /lib/modules/$(uname -r)/kernel/drivers
-sudo depmod
-*********************************************
-
-********** To make mobules ******************
-make menuconfig
-make modules
-*********************************************
-
-
-
-
-
-
-
 
 A1. Robomask (Yocto-servo and DFrobot DSS-M15 180deg servo motor)
 REFERENCE:
