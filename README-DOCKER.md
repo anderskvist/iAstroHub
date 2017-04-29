@@ -85,38 +85,6 @@ You can then copy your latest patch into this git repository by running: `docker
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
 
 ```
-
-A1. Robomask (Yocto-servo and DFrobot DSS-M15 180deg servo motor)
-REFERENCE:
-https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo
-http://www.dfrobot.com/index.php?route=product/product&product_id=120#.VzadFfl97IU
-
-
-cd /home/pi/www/
-./VirtualHub
-******************************
-http://10.0.0.1:4444
-Assign Logical name: robomask
-******************************
-
-root@iAstroHub:~# /home/pi/www/./YServo -s robomask.servo1 set_positionAtPowerOn -1000
-OK: robomask.servo1.set_positionAtPowerOn = -1000.
-OK: robomask.robomask.saveToFlash executed.
-
-root@iAstroHub:~# /home/pi/www/./YServo -s robomask.servo1 set_range 200
-OK: robomask.servo1.set_range = 200.
-OK: robomask.robomask.saveToFlash executed.
-
-***** Close ***** 
-root@iAstroHub:~# /home/pi/www/./YServo robomask.servo1 move 1000 5000
-OK: robomask.servo1.move = 1000 5000.
-
-***** Open ***** 
-root@iAstroHub:~# /home/pi/www/./YServo robomask.servo1 move -1000 5000
-OK: robomask.servo1.move = -1000 5000.
-
-
-
 A2. libftdi for Flip-Flat and other devices
 REFERENCE: http://www.intra2net.com/en/developer/libftdi/index.php
 
