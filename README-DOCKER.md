@@ -59,6 +59,7 @@ The following changes have been made while Dockerizing iAstroHub:
 * max_usb_current no longer set; has no effect on Raspberry Pi 3, which provides 1.2A by default. See: https://www.raspberrypi.org/forums/viewtopic.php?p=930695#p930695
 * User no longer expected to change password or grant root login access; those are responsibilities of a host, not a docker image.
 * Wifi instructions and procedure removed; setup is assumed to be handled by the host. 
+* Remove instructions to expand file system; assumed to be handled by host.
 
 ### Docker Run Requirements
 
@@ -81,14 +82,6 @@ You can then copy your latest patch into this git repository by running: `docker
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
 
 ```
-
-1. install Raspbian (2016-05-27-raspbian-jessie-lite)
-
-sudo raspi-config
-************************
-Expand filesystem and disable serial in advanced options, exit and reboot.
-
-
 
 17. FTDI modules
 
