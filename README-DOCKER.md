@@ -58,6 +58,7 @@ The following changes have been made while Dockerizing iAstroHub:
 * indi_simple_html_cherrypy_server binds to 0.0.0.0 instead of 10.0.0.1, so it is not dependent on a specific network-available IP address
 * max_usb_current no longer set; has no effect on Raspberry Pi 3, which provides 1.2A by default. See: https://www.raspberrypi.org/forums/viewtopic.php?p=930695#p930695
 * User no longer expected to change password or grant root login access; those are responsibilities of a host, not a docker image.
+* Wifi instructions and procedure removed; setup is assumed to be handled by the host. 
 
 ### Docker Run Requirements
 
@@ -86,40 +87,6 @@ Below is everything in the original README that has not yet been ported to Docke
 sudo raspi-config
 ************************
 Expand filesystem and disable serial in advanced options, exit and reboot.
-
-
-
-4. Wifi AP mode
-
-sudo apt-get install dnsmasq hostapd
-
-sudo nano /etc/hostapd/ap.conf
-************ ADD ******************
-interface=wlan0
-hw_mode=g
-channel=10
-auth_algs=1
-wpa=2
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=CCMP
-rsn_pairwise=CCMP
-wpa_passphrase=1234512345123
-ssid=iAstroHub
-
-
-sudo nano /etc/dnsmasq.conf
-******* ADD *******
-interface=wlan0
-dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h
-
-
-sudo nano /etc/rc.local
-*******************************************************
-sudo ifconfig wlan0 down
-sudo ifconfig wlan0 10.0.0.1 netmask 255.255.255.0 up
-sudo iwconfig wlan0 power off
-sudo service dnsmasq restart
-sudo hostapd -B /etc/hostapd/ap.conf & > /dev/null 2>&1
 
 
 
