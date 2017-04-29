@@ -83,12 +83,3 @@ You can then copy your latest patch into this git repository by running: `docker
 ## Status
 
 Below is everything in the original README that has not yet been ported to Docker. As features are ported over, they are removed from the text below.
-
-```
-A3. Preparation
-
-1) delete images in /home/pi/www/images/ and /home/pi/www/tmp_images/ 
-2) delete guiding and alert logs 
-3) set Null and uncheck debug in Linguider 
-```
-

@@ -87,6 +87,9 @@ RUN /build/run_control/run.sh
 COPY build/ftdi /build/ftdi
 RUN /build/ftdi/run.sh
 
+# Cleanup
+RUN rm -rf /home/pi/www/images/*
+
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "python /home/pi/indi/indiwebmanager/servermanager/drivermanager.py &" >> /start.sh && \
