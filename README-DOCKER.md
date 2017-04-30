@@ -15,7 +15,7 @@ Remaining work to be done towards this ends is:
 
 ## Building
 
-* From the iAstroHub root directory, run `./build`
+* From the iAstroHub root directory, run `./make`
 
 ## Running the container
 
