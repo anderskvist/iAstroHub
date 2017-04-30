@@ -98,4 +98,17 @@ RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "x11vnc -rfbport 5566 -forever -display :1 &" >> /start.sh && \
   echo "/home/pi/www/noVNC/utils/./launch.sh --vnc localhost:5566 --listen 5666 &" >> /start.sh && \
   chmod +x /start.sh
+
+# NoVNC
+EXPOSE 5666 5551 5552 5553
+
+# INDI Web Manager
+EXPOSE 8624
+
+# INDI Control Panel
+EXPOSE 8888
+
+# VNC
+EXPOSE 5900 5901
+
 CMD ["/start.sh"]
