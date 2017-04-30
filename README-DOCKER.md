@@ -22,6 +22,33 @@ Remaining work to be done towards this ends is:
 * You must run the container with the `--cap-add=ALL` option and with the `--privileged` flag.
 * You must mount kernel modules via `-v /lib/modules:/lib/modules:ro`
 
+The recommended `docker run` syntax is:
+
+```
+docker run \
+  -p 0.0.0.0:80:80 \
+  -p 0.0.0.0:5666:5666 \
+  -p 0.0.0.0:5551:5551 \
+  -p 0.0.0.0:5552:5552 \
+  -p 0.0.0.0:5553:5553 \
+  -p 0.0.0.0:7624:7624 \
+  -p 0.0.0.0:8624:8624 \
+  -p 0.0.0.0:8888:8888 \
+  -p 0.0.0.0:5900:5900 \
+  -p 0.0.0.0:5901:5901 \
+  --cap-add ALL \
+  --privileged \
+  -v /lib/modules:/lib/modules:ro \
+  iastrohub
+```
+
+If you are developing or testing iAstroHub, you may want to use the following additional flags:
+
+```
+--rm \ # Delete the container after it exits
+-it \ # Keep an interactive session; you can use ctrl+c to exit
+```
+
 ### Manual Steps
 
 The following steps are not yet automated, and so must be run by hand on the final image.

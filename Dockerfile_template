@@ -97,11 +97,19 @@ RUN echo "#!/usr/bin/env sh" > /start.sh && \
   echo "Xvfb :1 -screen 0 800x600x16 -ac &" >> /start.sh && \
   echo "x11vnc -rfbport 5566 -forever -display :1 &" >> /start.sh && \
   echo "/home/pi/www/noVNC/utils/./launch.sh --vnc localhost:5566 --listen 5666 &" >> /start.sh && \
+  echo "service php5-fpm start" >> /start.sh && \
+  echo "service nginx start" >> /start.sh && \
+  echo "tail -f /dev/null" >> /start.sh && \
   chmod +x /start.sh
+
+# Nginx web server
+EXPOSE 80
 
 # NoVNC
 EXPOSE 5666 5551 5552 5553
 
+# INDI Web Sockets
+EXPOSE 7624
 # INDI Web Manager
 EXPOSE 8624
 
