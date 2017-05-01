@@ -115,7 +115,4 @@ EXPOSE 8624
 # INDI Control Panel
 EXPOSE 8888
 
-# VNC
-EXPOSE 5900 5901
-
 CMD ["/start.sh"]

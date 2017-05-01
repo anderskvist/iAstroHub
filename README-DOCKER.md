@@ -33,8 +33,6 @@ docker run \
   -p 0.0.0.0:7624:7624 \
   -p 0.0.0.0:8624:8624 \
   -p 0.0.0.0:8888:8888 \
-  -p 0.0.0.0:5900:5900 \
-  -p 0.0.0.0:5901:5901 \
   --cap-add ALL \
   --privileged \
   -v /lib/modules:/lib/modules:ro \
