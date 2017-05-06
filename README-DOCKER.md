@@ -17,6 +17,18 @@ Remaining work to be done towards this ends is:
 
 * From the iAstroHub root directory, run `./make`
 
+### Releasing
+
+To release a new version of iAstroHub to the AstroSwarm container registry, use:
+
+```
+git pull
+./make
+docker login
+docker tag iastrohub astroswarm/iastrohub:latest
+docker push astroswarm/iastrohub:latest
+```
+
 ## Running the container
 
 * You must run the container with the `--cap-add=ALL` option and with the `--privileged` flag.
