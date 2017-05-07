@@ -19,15 +19,7 @@ Remaining work to be done towards this ends is:
 
 ### Releasing
 
-To release a new version of iAstroHub to the AstroSwarm container registry, use:
-
-```
-git pull
-./make
-docker login
-docker tag iastrohub astroswarm/iastrohub:latest
-docker push astroswarm/iastrohub:latest
-```
+To release a new version of iAstroHub to the AstroSwarm container registry, use `./release`
 
 ## Running the container
 
