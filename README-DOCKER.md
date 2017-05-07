@@ -40,6 +40,7 @@ docker run \
   --cap-add ALL \
   --privileged \
   -v /lib/modules:/lib/modules:ro \
+  --restart always \
   iastrohub
 ```
 
