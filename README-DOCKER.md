@@ -44,13 +44,6 @@ docker run \
   iastrohub
 ```
 
-If you are developing or testing iAstroHub, you may want to use the following additional flags:
-
-```
---rm \ # Delete the container after it exits
--it \ # Keep an interactive session; you can use ctrl+c to exit
-```
-
 ### Manual Steps
 
 The following steps are not yet automated, and so must be run by hand on the final image.
