@@ -95,9 +95,14 @@ RUN apt-get -y install net-tools vim
 
 # Create a startup script to run all our services
 RUN echo "#!/usr/bin/env sh" > /start.sh && \
+  echo "mkdir -p /var/log/nginx" >> /start.sh && \
+  echo "ln -sf /dev/stdout /var/log/nginx/access.log" >> /start.sh && \
+  echo "ln -sf /dev/stderr /var/log/nginx/error.log" >> /start.sh && \
+  echo "ln -sf /dev/stdout /var/log/php5-fpm.log" >> /start.sh && \
   echo "/etc/rc.local" >> /start.sh && \
   echo "service php5-fpm start" >> /start.sh && \
   echo "service nginx start" >> /start.sh && \
+  echo "echo \"Container services running.\"" >> /start.sh && \
   echo "tail -f /dev/null" >> /start.sh && \
   chmod +x /start.sh
 
